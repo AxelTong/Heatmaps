@@ -1,0 +1,10 @@
+PLANNER!
+
+Input: so quick lol
+Compute heatmap (clustering): Axel & Hanin
+Z score: Axel
+Visualization: Maarten
+Scrolling: Maarten
+
+FINAL DEADLINE = 28/04/2026
+Presentations = 29/04/2026
