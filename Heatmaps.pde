@@ -12,6 +12,7 @@ void setup() {
   printArray(testing[0]);
   //println(test.calculateColumnMeans());
   //println(test.calculateColumnStds());
+  printArray(test.normalize()[0]);
   printArray(test.normalize()[1]);
 }
 
