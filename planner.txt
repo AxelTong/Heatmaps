@@ -1,6 +1,6 @@
 PLANNER!
-
-Input: so quick lol
+CSV: Hanin
+Input: Hanin
 Compute heatmap (clustering): Axel & Hanin
 Z score: Axel
 Visualization: Maarten
