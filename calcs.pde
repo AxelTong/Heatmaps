@@ -1,3 +1,4 @@
+//check todo at bottom
 class calc {
     int columns;
     int rows;
@@ -52,3 +53,4 @@ class calc {
     }
 
 }
+//TODO: normalize differently! {{1,2,3},{4,5,6}} -> normalize between 1 and 4!!! Maths itself was good. 
