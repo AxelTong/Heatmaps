@@ -13,7 +13,7 @@ void setup() {
   //println(test.calculateColumnMeans());
   //println(test.calculateColumnStds());
   printArray(test.normalize()[0]);
-  printArray(test.normalize()[1]);
+  print(test.normalize()[1]);
 }
 
 void draw() {
