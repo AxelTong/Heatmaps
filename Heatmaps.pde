@@ -1,7 +1,7 @@
 /**
  Group project: Heatmaps
  */
-float[][] testing = {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
+float[][] testing = {{7, 10, 5}, {7, 7, 10}, {5, 2, 9}};
 
 
 
@@ -10,10 +10,14 @@ void setup() {
   background(255);
   calc test = new calc(3, 3, testing);
   printArray(testing[0]);
-  //println(test.calculateColumnMeans());
-  //println(test.calculateColumnStds());
+  println("means");
+  println(test.calculateColumnMeans());
+  println("stds");
+  println(test.calculateColumnStds());
+  println("norm");
   printArray(test.normalize()[0]);
   printArray(test.normalize()[1]);
+  printArray(test.normalize()[2]);
 }
 
 void draw() {

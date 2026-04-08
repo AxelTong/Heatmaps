@@ -19,7 +19,7 @@ class calc {
         this.columnStds = new float[columns];
     }
 
-    float[] calculateColumnMeans(){
+    /**float[] calculateColumnMeans(){
         for(int i = 0; i < input.length; i++){
             float tempValue = 0;
             for(int j = 0; j < input[i].length; j++){
@@ -28,8 +28,21 @@ class calc {
             columnMeans[i] = tempValue / input[i].length;
         }
         return columnMeans;
-    }
+    }**/
+// it's [column][row] not [row][column] dumb me
+// outputs mean of column, row stays the same
 
+    float[] calculateColumnMeans(){
+        for (int i = 0; i < input[0].length; i++){
+            float sum = 0;
+            for(int j = 0; j < input.length; j++){
+                sum = sum + input[j][i];
+            }
+            columnMeans[i] = sum / input.length;
+        }
+        return columnMeans;
+    }
+/**
     float[] calculateColumnStds(){
         calculateColumnMeans();
         for(int i = 0; i < input.length; i++){
@@ -41,12 +54,24 @@ class calc {
         }
         return columnStds;
     }
+*/
+    float[] calculateColumnStds(){
+        calculateColumnMeans();
+        for (int i = 0; i< input[0].length; i++){
+            float sum = 0;
+            for (int j = 0; j < input.length; j++){
+                sum = sum + sq(input[j][i] - columnMeans[i]);
+            }
+            columnStds[i] = sqrt(sum / input.length);
+        }
+        return columnStds;
+    }
 
     float[][] normalize(){
         calculateColumnStds();
-         for(int i = 0; i < input.length; i++){
-            for(int j = 0; j < input[i].length; j++){
-                normalized[i][j] = (input[i][j] - columnMeans[i]) / columnStds[i];
+        for (int i = 0; i < input[0].length; i++){
+            for (int j = 0; j < input.length; j++){
+                normalized[j][i] = (input[j][i] - columnMeans[i]) / columnStds[i];
             }
         }
         return normalized;
