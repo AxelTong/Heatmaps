@@ -4,6 +4,8 @@ class calc {
     int rows;
     float[][] input;
     float[][] normalized;
+    float[][] distanceMatrix;
+    float[][] inputMatrix;
     float[][] clustered;
     float[] columnMeans;
     float[] columnStds;
@@ -14,6 +16,7 @@ class calc {
         this.input = input;
 
         this.normalized = new float[rows][columns];
+        this.distanceMatrix = new float[rows][rows];
         this.clustered = new float[rows][columns];
         this.columnMeans = new float[columns];
         this.columnStds = new float[columns];
@@ -43,6 +46,26 @@ class calc {
             columnStds[i] = sqrt(sum / input.length);
         }
         return columnStds;
+    }
+
+    float[][] distanceMatrix(float[][] inputMatrix){
+        for(int i = 0; i < inputMatrix.length; i++){ // for each row
+            for(int j = 0; j < inputMatrix.length; j++){
+                float tempValue = 0;
+                for (int k = 0; k < inputMatrix[0].length; k++){
+                    tempValue = tempValue + abs(inputMatrix[i][k] - inputMatrix[j][k]);
+                }
+                distanceMatrix[i][j] = tempValue;
+            }
+        }
+        return distanceMatrix;
+    }
+
+    float[][] cluster(){
+
+
+
+        return clustered;
     }
 
     float[][] normalize(){
