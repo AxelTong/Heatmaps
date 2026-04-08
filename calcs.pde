@@ -19,16 +19,6 @@ class calc {
         this.columnStds = new float[columns];
     }
 
-    /**float[] calculateColumnMeans(){
-        for(int i = 0; i < input.length; i++){
-            float tempValue = 0;
-            for(int j = 0; j < input[i].length; j++){
-                tempValue += input[i][j]; 
-            }
-            columnMeans[i] = tempValue / input[i].length;
-        }
-        return columnMeans;
-    }**/
 // it's [column][row] not [row][column] dumb me
 // outputs mean of column, row stays the same
 
@@ -42,19 +32,7 @@ class calc {
         }
         return columnMeans;
     }
-/**
-    float[] calculateColumnStds(){
-        calculateColumnMeans();
-        for(int i = 0; i < input.length; i++){
-            float sum = 0;
-            for(int j = 0; j < input[i].length; j++){
-                sum += sq(input[i][j] - columnMeans[i]);
-            }
-            columnStds[i] = sqrt(sum / input[i].length);
-        }
-        return columnStds;
-    }
-*/
+
     float[] calculateColumnStds(){
         calculateColumnMeans();
         for (int i = 0; i< input[0].length; i++){
@@ -78,4 +56,3 @@ class calc {
     }
 
 }
-//TODO: normalize differently! {{1,2,3},{4,5,6}} -> normalize between 1 and 4!!! Maths itself was good. 
