@@ -19,9 +19,9 @@ void setup() {
   printArray(test.normalize()[1]);
   printArray(test.normalize()[2]);
   println("distance matrix");
-  printArray(test.distanceMatrix(test.distanceMatrix(testing))[0]);
-  printArray(test.distanceMatrix(test.distanceMatrix(testing))[1]);
-  printArray(test.distanceMatrix(test.distanceMatrix(testing))[2]);
+  printArray(test.calculateDistanceMatrix(testing)[0]);
+  printArray(test.calculateDistanceMatrix(testing)[1]);
+  printArray(test.calculateDistanceMatrix(testing)[2]);
 }
 
 void draw() {

@@ -48,14 +48,14 @@ class calc {
         return columnStds;
     }
 
-    float[][] distanceMatrix(float[][] inputMatrix){
-        for(int i = 0; i < inputMatrix.length; i++){ // for each row
-            for(int j = 0; j < inputMatrix.length; j++){
-                float tempValue = 0;
-                for (int k = 0; k < inputMatrix[0].length; k++){
-                    tempValue = tempValue + abs(inputMatrix[i][k] - inputMatrix[j][k]);
+    float[][] calculateDistanceMatrix(float[][] inputMatrix){ // calculates distance matrix following manhattan
+        for(int i = 0; i < inputMatrix.length; i++){ // for each row of the distance matrix
+            for(int j = 0; j < inputMatrix.length; j++){ // for each column of the distance matrix
+                float sum = 0;
+                for (int k = 0; k < inputMatrix[0].length; k++){ // for each column of the input matrix
+                    sum = sum + abs(inputMatrix[i][k] - inputMatrix[j][k]); // manhattan distance, value of [i (current row)] [k (current column)] - [j (comparing row)] [k (current column)]
                 }
-                distanceMatrix[i][j] = tempValue;
+                distanceMatrix[i][j] = sum;
             }
         }
         return distanceMatrix;
