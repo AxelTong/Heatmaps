@@ -26,9 +26,23 @@ float thumbH;
 boolean draggingThumb = false;
 float dragOffsetY = 0;
 
-void setup() {
+void setup() { 
   size(1200, 720);
-  generateMockData(300, 14);
+  loadCSV("heart.csv");
+}
+void loadCSV(String heart.csv) { // Deze functie laadt de CSV en zet deze om in een 2D array van floats
+  Table table = loadTable(heart.csv, "header"); // Zorgt ervoor dat de eerste rij als header wordt gezien
+
+  rows = table.getRowCount(); // Het aantal rijen in de CSV wordt opgeslagen in de variabele 'rows'
+  cols = table.getColumnCount(); // Het aantal kolommen in de CSV wordt opgeslagen in de variabele 'cols'
+
+  values = new float[rows][cols]; // Er wordt een 2D array van floats (getal met decimalen) gemaakt met de afmetingen van het aantal rijen en kolommen
+
+  for (int r = 0; r < rows; r++) { // Loop door alle rijen en kolommen en kopieer elke waarde uit de tabel 
+    for (int c = 0; c < cols; c++) {
+      values[r][c] = table.getFloat(r, c);
+    }
+  }
 }
 
 void draw() {
