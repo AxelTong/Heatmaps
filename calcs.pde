@@ -25,7 +25,7 @@ class calc {
 // it's [column][row] not [row][column] dumb me
 // outputs mean of column, row stays the same
 
-    float[] calculateColumnMeans(){
+    float[] calculateColumnMeans(){ // mathematical average
         for (int i = 0; i < input[0].length; i++){
             float sum = 0;
             for(int j = 0; j < input.length; j++){
@@ -36,7 +36,7 @@ class calc {
         return columnMeans;
     }
 
-    float[] calculateColumnStds(){
+    float[] calculateColumnStds(){ // standard deviation
         calculateColumnMeans();
         for (int i = 0; i< input[0].length; i++){
             float sum = 0;
@@ -61,7 +61,7 @@ class calc {
         return distanceMatrix;
     }
 
-    float[][] cluster(){
+    float[][] cluster(){ //TODO
 
 
 

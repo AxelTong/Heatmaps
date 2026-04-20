@@ -29,9 +29,10 @@ float dragOffsetY = 0;
 void setup() { 
   size(1200, 720);
   loadCSV("heart.csv");
+  
 }
-void loadCSV(String heart.csv) { // Deze functie laadt de CSV en zet deze om in een 2D array van floats
-  Table table = loadTable(heart.csv, "header"); // Zorgt ervoor dat de eerste rij als header wordt gezien
+void loadCSV(String heartCSV) { // Deze functie laadt de CSV en zet deze om in een 2D array van floats
+  Table table = loadTable(heartCSV, "header"); // Zorgt ervoor dat de eerste rij als header wordt gezien
 
   rows = table.getRowCount(); // Het aantal rijen in de CSV wordt opgeslagen in de variabele 'rows'
   cols = table.getColumnCount(); // Het aantal kolommen in de CSV wordt opgeslagen in de variabele 'cols'
