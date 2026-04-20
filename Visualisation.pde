@@ -95,6 +95,43 @@ void draw() {
 
   noClip();
 
+  // Hover functie
+
+  for (int r = 0; r < rows; r++) {
+    for (int c = 0; c < cols; c++) {
+
+      float x = marginLeft + c * cellW;
+      float y = marginTop + r * cellH - scrollY;
+
+      if (mouseX > x && mouseX < x + cellW &&
+          mouseY > y && mouseY < y + cellH) {
+
+        String label = "Waarde: " + values[r][c];
+
+     
+        float tw = 105;
+        float th = 20;
+
+        float tx = mouseX + 12;
+        float ty = mouseY - 25;
+
+       
+
+        fill(0, 180);
+        noStroke();
+        rect(tx, ty, tw, th, 5);
+
+        fill(255);
+        text(label, tx + 5 , ty + 13);
+
+        
+      }
+    }
+  }
+
+        
+
+
   // Boord rond heatmap
   noFill();
   stroke(180);
