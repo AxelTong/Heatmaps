@@ -1,6 +1,7 @@
 import processing.event.MouseEvent;
 
 float[][] values;
+float[][] normalized;
 
 int rows;
 int cols;
@@ -29,8 +30,11 @@ float dragOffsetY = 0;
 void setup() { 
   size(1200, 720);
   loadCSV("heart.csv");
-  
+  calc test = new calc(cols, rows, values);
+  printArray(test.normalize()[11]);
+  normalized = test.normalize();
 }
+
 void loadCSV(String heartCSV) { // Deze functie laadt de CSV en zet deze om in een 2D array van floats
   Table table = loadTable(heartCSV, "header"); // Zorgt ervoor dat de eerste rij als header wordt gezien
 
@@ -74,10 +78,10 @@ void draw() {
   noStroke();
   for (int r = 0; r < rows; r++) {
     for (int c = 0; c < cols; c++) {
-      float val = values[r][c];
+      float val = normalized[r][c];
 
       // Voorlopige normalisatie voor demo
-      float norm = map(val, 0, 100, 0, 1);
+      float norm = map(val, 0, 2, 0, 1);
       color cellColor = lerpColor(
         color(0, 100, 255),
         color(255, 60, 60),
