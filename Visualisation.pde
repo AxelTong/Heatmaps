@@ -3,6 +3,8 @@ import processing.event.MouseEvent;
 float[][] values;
 float[][] normalized;
 
+String[] headers = {"age", "sex", "cp", "trestbps", "chol", "fbs", "restecg", "thalach", "exang", "oldpeak", "slope", "ca", "thal", "target"};
+
 int rows;
 int cols;
 
@@ -52,6 +54,12 @@ void loadCSV(String heartCSV) { // Deze functie laadt de CSV en zet deze om in e
 
 void draw() {
   background(245);
+
+// titels
+  for (int i = 0; i < headers.length; i++) {
+    text(headers[i], 150 + i * 70, 20);
+  }
+
 
   float gridWidth = width - marginLeft - marginRight;
   float gridHeight = height - marginTop - marginBottom;
@@ -134,7 +142,7 @@ void draw() {
     }
   }
 
-        
+    
 
 
   // Boord rond heatmap
