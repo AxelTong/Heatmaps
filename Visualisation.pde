@@ -40,7 +40,24 @@ void setup() {
 
 void loadCSV(String heartCSV) { // Deze functie laadt de CSV en zet deze om in een 2D array van floats
   Table table = loadTable(heartCSV, "header"); // Zorgt ervoor dat de eerste rij als header wordt gezien
+// Remove all rows that contain a "?"
+  for (int r = table.getRowCount() - 1; r >= 0; r--) {
+    TableRow row = table.getRow(r);
 
+    boolean hasmissing = false;
+
+    for (int c = 0; c < table.getColumnCount(); c++) {
+      String cell = row.getString(c);
+      if (cell.equals("?")) {
+        hasmissing = true;
+        break;
+      }
+    }
+
+    if (hasmissing) {
+      table.removeRow(r);
+    }
+  }
   rows = table.getRowCount(); // Het aantal rijen in de CSV wordt opgeslagen in de variabele 'rows'
   cols = table.getColumnCount(); // Het aantal kolommen in de CSV wordt opgeslagen in de variabele 'cols'
 
