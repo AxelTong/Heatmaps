@@ -9,7 +9,7 @@ int rows;
 int cols;
 
 // Layout
-float marginLeft = 120;
+float marginLeft = 360;
 float marginTop = 80;
 float marginRight = 70;
 float marginBottom = 40;
@@ -264,15 +264,4 @@ void updateScrollFromThumb(float newThumbY) {
   scrollY = map(thumbY, scrollbarY, scrollbarY + maxThumbTravel, 0, maxScrollY);
 }
 
-void generateMockData(int rCount, int cCount) {
-  rows = rCount;
-  cols = cCount;
-  values = new float[rows][cols];
 
-
-  for (int r = 0; r < rows; r++) {
-    for (int c = 0; c < cols; c++) {
-      values[r][c] = random(0, 100);
-    }
-  }
-}
