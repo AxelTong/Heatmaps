@@ -31,7 +31,8 @@ void setup() {
   size(1200, 720);
   loadCSV("heart.csv");
   calc test = new calc(cols, rows, values);
-  printArray(test.normalize()[11]);
+  printArray(test.normalize()[0][11]);
+  println(test.calculateColumnStds());
   normalized = test.normalize();
 }
 
