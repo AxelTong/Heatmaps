@@ -29,8 +29,12 @@ float thumbH;
 boolean draggingThumb = false;
 float dragOffsetY = 0;
 
-void setup() { 
+void setup() {
+  
   size(1200, 720);
+  // legend
+
+
   loadCSV("heart.csv");
   calc test = new calc(cols, rows, values);
   calc a = new calc(testing.length, testing[0].length, testing);
@@ -77,12 +81,6 @@ void loadCSV(String heartCSV) { // Deze functie laadt de CSV en zet deze om in e
 void draw() {
   background(245);
 
-// titels
-  for (int i = 0; i < headers.length; i++) {
-    text(headers[i], 150 + i * 70, 20);
-  }
-
-
   float gridWidth = width - marginLeft - marginRight;
   float gridHeight = height - marginTop - marginBottom;
 
@@ -95,6 +93,11 @@ void draw() {
   // onderstaande regels zorgen ervoor dat je niet verder kan scrollen dan nodig en dat je thumb wordt aangepast aan het aantal cellen
   float maxScrollY = max(0, HeightAllCells - gridHeight);
   scrollY = constrain(scrollY, 0, maxScrollY);
+
+  // titels
+  for (int i = 0; i < headers.length; i++) {
+    text(headers[i], marginLeft + i * cellW, marginTop - 10);
+  }
 
   // Heatmap achtergrond
   noStroke();
@@ -141,7 +144,7 @@ void draw() {
       if (mouseX > x && mouseX < x + cellW &&
           mouseY > y && mouseY < y + cellH) {
 
-        String label = "Waarde: " + values[r][c];
+        String label = headers[c] + ": " + values[r][c];
 
      
         float tw = 105;
