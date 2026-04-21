@@ -48,7 +48,7 @@ class calc {
         return columnStds;
     }
 
-    float[][] calculateDistanceMatrix(float[][] inputMatrix){ // calculates distance matrix following manhattan
+    float[][] calculateDistanceMatrix(float[][] inputMatrix){ // calculates distance matrix following manhattan for each person
         for(int i = 0; i < inputMatrix.length; i++){ // for each row of the distance matrix
             for(int j = 0; j < inputMatrix.length; j++){ // for each column of the distance matrix
                 float sum = 0;
