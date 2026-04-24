@@ -5,10 +5,11 @@ class calc {
     float[][] input;
     float[][] normalized;
     float[][] distanceMatrix;
-    float[][] inputMatrix;
     float[][] clustered;
     float[] columnMeans;
     float[] columnStds;
+    float[] maxOfColumn;
+    float[] minOfColumn;
 
     calc(int columns, int rows, float[][] input) {
         this.columns = columns;
@@ -20,6 +21,8 @@ class calc {
         this.clustered = new float[rows][columns];
         this.columnMeans = new float[columns];
         this.columnStds = new float[columns];
+        this.maxOfColumn = new float[columns];
+        this.minOfColumn = new float[columns];
     }
 
                     // it's [column][row] not [row][column] dumb me
@@ -36,6 +39,34 @@ class calc {
         return columnMeans;
     }
 
+    float[] getColumnMax(){ // gets maximum of each column of normalized data
+        normalize();
+        for (int i = 0; i < normalized[0].length; i++){
+            float max = normalized[0][i];
+            for(int j = 0; j < normalized.length; j++){
+                if (normalized[j][i] > max){
+                    max = normalized[j][i];
+                }
+            }
+            maxOfColumn[i] = max;
+        }
+        return maxOfColumn;
+    }
+
+    float[] getColumnMin(){ // gets minimum of each column of normalized data
+        normalize();
+        for (int i = 0; i < normalized[0].length; i++){
+            float min = normalized[0][i];
+            for(int j = 0; j < normalized.length; j++){
+                if (normalized[j][i] < min){
+                    min = normalized[j][i];
+                }
+            }
+            minOfColumn[i] = min;
+        }
+        return minOfColumn;
+    }
+
     float[] calculateColumnStds(){ // standard deviation
         calculateColumnMeans();
         for (int i = 0; i< input[0].length; i++){
@@ -48,12 +79,14 @@ class calc {
         return columnStds;
     }
 
-    float[][] calculateDistanceMatrix(float[][] inputMatrix){ // calculates distance matrix following manhattan for each person
-        for(int i = 0; i < inputMatrix.length; i++){ // for each row of the distance matrix
-            for(int j = 0; j < inputMatrix.length; j++){ // for each column of the distance matrix
+    float[][] calculateDistanceMatrix(float[][] normalized){ // calculates distance matrix following gower's for each person
+        getColumnMax();
+        getColumnMin();
+        for(int i = 0; i < normalized.length; i++){ // for each row of the distance matrix
+            for(int j = 0; j < normalized.length; j++){ // for each column of the distance matrix
                 float sum = 0;
-                for (int k = 0; k < inputMatrix[0].length; k++){ // for each column of the input matrix
-                    sum = sum + abs(inputMatrix[i][k] - inputMatrix[j][k]); // manhattan distance, value of [i (current row)] [k (current column)] - [j (comparing row)] [k (current column)]
+                for (int k = 0; k < normalized[0].length; k++){ // for each column of the normalized matrix
+                    sum = sum + (abs(normalized[i][k] - normalized[j][k])/(maxOfColumn[k]-minOfColumn[k])); // Gower's distance: similarity is 1 - (absolute value of the difference between the two values / the maximum of the two values), we want distance -> don't subtract from 1. 
                 }
                 distanceMatrix[i][j] = sum;
             }
