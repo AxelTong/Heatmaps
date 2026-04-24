@@ -22,8 +22,8 @@ class calc {
         this.columnStds = new float[columns];
     }
 
-// it's [column][row] not [row][column] dumb me
-// outputs mean of column, row stays the same
+                    // it's [column][row] not [row][column] dumb me
+                    // outputs mean of column, row stays the same
 
     float[] calculateColumnMeans(){ // mathematical average
         for (int i = 0; i < input[0].length; i++){

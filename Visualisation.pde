@@ -32,14 +32,10 @@ float dragOffsetY = 0;
 void setup() { 
   size(1200, 720);
   loadCSV("heart.csv");
-  calc test = new calc(cols, rows, values);
-  calc a = new calc(testing.length, testing[0].length, testing);
-  //printArray(test.normalize()[0][11]);
-  //println(test.calculateColumnStds());
-  normalized = test.normalize();
-  printArray(a.calculateDistanceMatrix(testing)[0]);
-  printArray(a.calculateDistanceMatrix(testing)[1]);
-  printArray(a.calculateDistanceMatrix(testing)[2]);
+  calc calculate = new calc(cols, rows, values);
+  //printArray(calculate.normalize()[0][11]);
+  //println(calculate.calculateColumnStds());
+  normalized = calculate.normalize();
 }
 
 void loadCSV(String heartCSV) { // Deze functie laadt de CSV en zet deze om in een 2D array van floats
