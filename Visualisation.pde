@@ -8,6 +8,10 @@ String[] headers = {"age", "sex", "cp", "trestbps", "chol", "fbs", "restecg", "t
 int rows;
 int cols;
 
+// Legend
+int fourloop = 1;
+color c1, c2;
+
 // Layout
 float marginLeft = 360;
 float marginTop = 80;
@@ -29,10 +33,18 @@ float thumbH;
 boolean draggingThumb = false;
 float dragOffsetY = 0;
 
+//cellen
+float cellH = 24;
+float cellW = 55;
+float maxCellH = 50;
+float minCellH = 2;
+
 void setup() {
   
   size(1200, 720);
   // legend
+  c1 = color(120, 180, 120);
+  c2 = color(180, 80, 80);
 
 
   loadCSV("heart.csv");
@@ -80,29 +92,30 @@ void loadCSV(String heartCSV) { // Deze functie laadt de CSV en zet deze om in e
 
 void draw() {
   background(245);
-
   float gridWidth = width - marginLeft - marginRight;
   float gridHeight = height - marginTop - marginBottom;
 
-  // Zorgt ervoor dat ongeacht de aantal rijen de kolommen passen
-  float cellW = gridWidth / cols;
-
-  // We kiezen een vaste celhoogte, in tegenstelling tot de kolommen, zodat scrollen nodig wordt
-  float cellH = 24;
+ // We kiezen een vaste celhoogte, in tegenstelling tot de kolommen, zodat scrollen nodig wordt
   float HeightAllCells = rows * cellH;
   // onderstaande regels zorgen ervoor dat je niet verder kan scrollen dan nodig en dat je thumb wordt aangepast aan het aantal cellen
   float maxScrollY = max(0, HeightAllCells - gridHeight);
   scrollY = constrain(scrollY, 0, maxScrollY);
 
   // titels
+  textSize(14);
   for (int i = 0; i < headers.length; i++) {
     text(headers[i], marginLeft + i * cellW, marginTop - 10);
   }
 
-  // Heatmap achtergrond
-  noStroke();
-  fill(255);
-  rect(marginLeft, marginTop, gridWidth, gridHeight);
+  // aftiteling
+  textSize(10);
+  fill(0);
+  text("by Axel Tong, X and Maarten De Feyter", 10, height - 20);
+
+
+  // Heatmap achtergrond + aflijning
+  fill(0);
+  rect(marginLeft - 2, marginTop - 2, gridWidth + 4, gridHeight + 4);
 
   // ik heb de 'viewport' aangeduid met de reeds bepaalde integers; deze kunnen vrij simpel worden aangepast indien nodig. De clip-functie maakt dit simpel
   clip((int)marginLeft, (int)marginTop, (int)gridWidth, (int)gridHeight);
@@ -116,8 +129,8 @@ void draw() {
       // Voorlopige normalisatie voor demo
       float norm = map(val, -2, 2, 0, 1);
       color cellColor = lerpColor(
-        color(0, 100, 255),
-        color(255, 60, 60),
+        c1,
+        c2,
         norm
         );
 
@@ -132,6 +145,13 @@ void draw() {
   }
 
   noClip();
+
+  // grading + rand
+  
+  fill(0);
+  rect(318,478,24,204);
+  setGradient(320, 480, 20, 200, c1, c2); 
+  
 
   // Hover functie
 
@@ -162,10 +182,13 @@ void draw() {
         fill(255);
         text(label, tx + 5 , ty + 13);
 
-        
+        noFill();
+        rect()
       }
     }
   }
+
+
 
     
 
@@ -203,6 +226,17 @@ void draw() {
   rect(scrollbarX, thumbY, scrollbarWidth, thumbH, 8);
 }
 
+// legend color grading
+void setGradient(int x, int y, float w, float h, color c1, color c2) {
+
+    for (int i = y; i <= y+h; i++) {
+      float inter = map(i, y, y+h, 0, 1);
+      color c = lerpColor(c1, c2, inter);
+      stroke(c);
+      line(x, i, x+w, i);
+    }
+}
+
 // Drie manieren om te scrollen; scrollen (mousewheel), slepen (mousepressed) en pijltjes (keypressed)
 // deze functie is gevonden op reference van processing
 void mouseWheel (MouseEvent event) {
@@ -216,7 +250,16 @@ void keyPressed() {
   } else if (keyCode == UP) {
     scrollY -= scrollSpeed;
   }
+
+  if (key == '-') {
+    cellH = max(minCellH, cellH - 2);
+  }
+
+  if (key == '+') {
+    cellH = min(maxCellH, cellH + 2);
+  }
 }
+
 
 // Dit was een best lastig deel; maar na wat yt filmpjes relatief simpel
 
