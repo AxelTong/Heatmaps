@@ -183,7 +183,7 @@ void draw() {
         text(label, tx + 5 , ty + 13);
 
         noFill();
-        rect()
+      
       }
     }
   }
