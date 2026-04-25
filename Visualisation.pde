@@ -143,7 +143,7 @@ void draw() {
   // ik heb de 'viewport' aangeduid met de reeds bepaalde integers; deze kunnen vrij simpel worden aangepast indien nodig. De clip-functie maakt dit simpel
   clip((int)marginLeft, (int)marginTop, (int)gridWidth, (int)gridHeight);
 
-  // Heatmap cellen kleuren
+  // Heatmap cellen kleuren, 
   noStroke();
   for (int r = 0; r < rows; r++) {
     for (int c = 0; c < cols; c++) {
@@ -156,7 +156,7 @@ color cellColor;
 if (headers[c].equals("sex") || headers[c].equals("fbs") ||
     headers[c].equals("exang") || headers[c].equals("target")) {
 
-  // categorische  binaire kolommen: vaste kleuren
+  // categorische of binaire kolommen: vaste kleuren
   if (val == 1) {
     cellColor = color(120, 180, 120);      
   } else {
@@ -173,7 +173,6 @@ if (headers[c].equals("sex") || headers[c].equals("fbs") ||
 }
 
 fill(cellColor);
-
 
 
       // De 'scrollY' is where the magic happens wat betreft scrollfunctie; deze hangt af van het scrollen
