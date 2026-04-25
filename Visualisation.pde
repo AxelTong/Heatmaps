@@ -199,7 +199,7 @@ if (headers[c].equals("sex") || headers[c].equals("fbs") ||
   float norm = map(normVal, -2, 2, 0, 1);
   norm = constrain(norm, 0, 1);
 
-  cellColor = lerpColor(c1, c2, norm);
+  cellColor = lerpColor(lowColor, highColor, norm);
 }
 
 fill(cellColor);
@@ -218,7 +218,7 @@ fill(cellColor);
   
   fill(0);
   rect(318,478,24,204);
-  setGradient(320, 480, 20, 200, c1, c2); 
+  setGradient(320, 480, 20, 200, lowColor, highColor); 
   
 int hoveredRow = -1;
   // Hover functie
