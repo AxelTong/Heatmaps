@@ -104,7 +104,7 @@ class calc {
 
     boolean[] matchCategoricals(){
         for (int i = 0; i < columns; i++){
-            if (headers[i] == ("sex") || headers[i] == ("fbs") || headers[i] == ("exang") || headers[i] == ("target") || headers[i] == "cp" || headers[i] == "restecg" || headers[i] == "exang" || headers[i] == "slope" || headers[i] == "thal"){ // if the column is a categorical variable
+            if (headers[i].equals("sex") || headers[i].equals("fbs") || headers[i].equals("exang") || headers[i].equals("target") || headers[i].equals("cp") || headers[i].equals("restecg") || headers[i].equals("exang") || headers[i].equals("slope") || headers[i].equals("thal")){ // if the column is a categorical variable
                 categorical[i] = true;
             } else {
                 categorical[i] = false;
