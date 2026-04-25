@@ -2,7 +2,7 @@ import processing.event.MouseEvent;
 
 float[][] values;
 float[][] normalized;
-
+int[] rowOrder;
 String[] headers;
 
 int rows;
@@ -46,16 +46,14 @@ void setup() {
   c1 = color(120, 180, 120);
   c2 = color(180, 80, 80);
 
-
   loadCSV("heart.csv");
+
   calc calculate = new calc(cols, rows, values, headers);
-  //printArray(calculate.normalize()[0][11]);
-  //println(calculate.calculateColumnStds());
   normalized = calculate.normalize();
-  println(calculate.calculateDistanceMatrix(normalized)[0]);
-  println(calculate.maxOfColumn);
-  println(calculate.matchCategoricals());
-  println(calculate.cluster());
+  calculate.calculateDistanceMatrix(normalized);
+  rowOrder = calculate.singleLinkageOrder();
+  values = reorderRows(values, rowOrder);
+  normalized = reorderRows(normalized, rowOrder);
 }
 
 void loadCSV(String heartCSV) { // Deze functie laadt de CSV en zet deze om in een 2D array van floats
@@ -90,7 +88,19 @@ void loadCSV(String heartCSV) { // Deze functie laadt de CSV en zet deze om in e
     }
   }
 }
+float[][] reorderRows(float[][] data, int[] order) {
+  float[][] result = new float[order.length][data[0].length];
 
+  for (int newR = 0; newR < order.length; newR++) {
+    int oldR = order[newR];
+
+    for (int col = 0; col < data[0].length; col++) {
+      result[newR][col] = data[oldR][col];
+    }
+  }
+
+  return result;
+}
 void draw() {
   background(245);
   float gridWidth = width - marginLeft - marginRight;

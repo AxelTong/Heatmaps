@@ -174,7 +174,67 @@ class calc {
 
     return clusters;
 }
+float singleLinkageDistance(IntList clusterA, IntList clusterB) {
 
+  float minDist = Float.MAX_VALUE;
+
+  for (int i = 0; i < clusterA.size(); i++) {
+    int rowA = clusterA.get(i);
+
+    for (int j = 0; j < clusterB.size(); j++) {
+      int rowB = clusterB.get(j);
+
+      if (distanceMatrix[rowA][rowB] < minDist) {
+        minDist = distanceMatrix[rowA][rowB];
+      }
+    }
+  }
+
+  return minDist;
+}
+
+
+int[] singleLinkageOrder() {
+
+  ArrayList<IntList> clusters = new ArrayList<IntList>();
+
+  for (int i = 0; i < rows; i++) {
+    IntList oneCluster = new IntList();
+    oneCluster.append(i);
+    clusters.add(oneCluster);
+  }
+
+  while (clusters.size() > 1) {
+
+    float bestDistance = Float.MAX_VALUE;
+    int bestA = -1;
+    int bestB = -1;
+
+    for (int a = 0; a < clusters.size(); a++) {
+      for (int b = a + 1; b < clusters.size(); b++) {
+
+        float d = singleLinkageDistance(clusters.get(a), clusters.get(b));
+
+        if (d < bestDistance) {
+          bestDistance = d;
+          bestA = a;
+          bestB = b;
+        }
+      }
+    }
+
+    IntList clusterA = clusters.get(bestA);
+    IntList clusterB = clusters.get(bestB);
+
+    for (int i = 0; i < clusterB.size(); i++) {
+      clusterA.append(clusterB.get(i));
+    }
+
+    clusters.remove(bestB);
+  }
+
+  return clusters.get(0).array();
+}
     float[][] normalize(){
         calculateColumnStds();
         for (int i = 0; i < input[0].length; i++){
