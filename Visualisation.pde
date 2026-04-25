@@ -8,8 +8,7 @@ String[] headers;
 int rows;
 int cols;
 
-// Legend
-int fourloop = 1;
+// grading kleuren
 color c1, c2;
 
 // Layout
@@ -42,7 +41,8 @@ float minCellH = 2;
 void setup() {
   
   size(1200, 720);
-  // legend
+
+  // kleuren grading
   c1 = color(120, 180, 120);
   c2 = color(180, 80, 80);
 
@@ -112,6 +112,30 @@ void draw() {
   fill(0);
   text("by Axel Tong, X and Maarten De Feyter", 10, height - 20);
 
+  // legend
+   textSize(10);
+  fill(0);
+  text("age = Age in years", 10, 20 + marginTop);
+  text("sex = Sex (1 = male; 0 = female)", 10, 40 + marginTop);
+  text("cp = Chest pain type (0-3)", 10, 60 + marginTop);
+  text("trestbps = Resting blood pressure", 10, 80 + marginTop);
+  text("chol = Serum cholesterol", 10, 100 + marginTop);
+  text("fbs = Fasting blood sugar", 10, 120 + marginTop);
+  text("restecg = Resting electrocardiographic results", 10, 140 + marginTop);
+  text("thalach = Maximum heart rate achieved", 10, 160 + marginTop);
+  text("exang = Exercise induced angina", 10, 180 + marginTop);
+  text("oldpeak = ST depression induced by exercise relative to rest", 10,
+  200 + marginTop);
+  text("slope = The slope of the peak exercise ST segment", 10,
+  220 + marginTop);
+  text("ca = Number of major vessels (0-3) colored by flouroscopy", 10, 240 + marginTop);
+  text("thal = Thalassemia", 10, 260 + marginTop);
+  text("target = 1 or 0 (disease or no disease)", 10, 280 + marginTop);   
+
+
+
+ 
+
 
   // Heatmap achtergrond + aflijning
   fill(0);
@@ -120,21 +144,36 @@ void draw() {
   // ik heb de 'viewport' aangeduid met de reeds bepaalde integers; deze kunnen vrij simpel worden aangepast indien nodig. De clip-functie maakt dit simpel
   clip((int)marginLeft, (int)marginTop, (int)gridWidth, (int)gridHeight);
 
-  // Heatmap cellen
+  // Heatmap cellen kleuren, 
   noStroke();
   for (int r = 0; r < rows; r++) {
     for (int c = 0; c < cols; c++) {
-      float val = normalized[r][c];
+  
 
-      // Voorlopige normalisatie voor demo
-      float norm = map(val, -2, 2, 0, 1);
-      color cellColor = lerpColor(
-        c1,
-        c2,
-        norm
-        );
+  
+float val = values[r][c];
+color cellColor;
 
-      fill(cellColor);
+if (headers[c].equals("sex") || headers[c].equals("fbs") ||
+    headers[c].equals("exang") || headers[c].equals("target")) {
+
+  // categorische of binaire kolommen: vaste kleuren
+  if (val == 1) {
+    cellColor = color(120, 180, 120);      
+  } else {
+    cellColor = color(180, 80, 80);     
+  }
+
+} else {
+  // numerieke kolommen: gebruik je genormaliseerde waarde
+  float normVal = normalized[r][c];
+  float norm = map(normVal, -2, 2, 0, 1);
+  norm = constrain(norm, 0, 1);
+
+  cellColor = lerpColor(c1, c2, norm);
+}
+
+fill(cellColor);
 
 
       // De 'scrollY' is where the magic happens wat betreft scrollfunctie; deze hangt af van het scrollen
@@ -226,7 +265,7 @@ void draw() {
   rect(scrollbarX, thumbY, scrollbarWidth, thumbH, 8);
 }
 
-// legend color grading
+//  color grading
 void setGradient(int x, int y, float w, float h, color c1, color c2) {
 
     for (int i = y; i <= y+h; i++) {
