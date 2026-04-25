@@ -109,7 +109,7 @@ void draw() {
   // aftiteling
   textSize(10);
   fill(0);
-  text("by Axel Tong, X and Maarten De Feyter", 10, height - 20);
+  text("by Axel Tong, Hanin El Tabaa and Maarten De Feyter", 10, height - 20);
 
 
   // Heatmap achtergrond + aflijning

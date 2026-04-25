@@ -143,12 +143,37 @@ class calc {
     //float[] smallestDistance(){} //TODO
     
 
-    float[][] cluster(){ //TODO
+   int[] cluster() {
 
+    int[] clusters = new int[rows];
 
-
-        return clustered;
+    // iedereen start in eigen cluster
+    for (int i = 0; i < rows; i++) {
+        clusters[i] = i;
     }
+
+    // zoek dichtste buur
+    for (int i = 0; i < rows; i++) {
+
+        float minDist = Float.MAX_VALUE;
+        int closest = -1;
+
+        for (int j = 0; j < rows; j++) {
+
+            if (i != j && distanceMatrix[i][j] < minDist) {
+                minDist = distanceMatrix[i][j];
+                closest = j;
+            }
+        }
+
+        // zelfde cluster
+        if (closest != -1) {
+            clusters[i] = clusters[closest];
+        }
+    }
+
+    return clusters;
+}
 
     float[][] normalize(){
         calculateColumnStds();
