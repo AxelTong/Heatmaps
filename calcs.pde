@@ -147,7 +147,7 @@ class calc {
     
     float[][] getLinkageMatrix(){ // calculating linkage matrix for single linkage clustering
         calculateDistanceMatrix(normalized);
-        int maxClusters = 2 * rows - 1; // in the worst case we merge 2 clusters in each step, so we have at most 2*rows-1 clusters, thanks Codex
+        int maxClusters = 2 * rows - 1; // in the worst case we merge 2 clusters in each step
         int[] sizes = new int[maxClusters]; // keeps track of the size of each cluster, initially all clusters are of size 1
         for (int i = 0; i < rows; i++){
             sizes[i] = 1; // initially all clusters are of size 1, we have as many clusters as rows
@@ -156,39 +156,76 @@ class calc {
         for (int i = 0; i < rows; i++){
             active[i] = 1;
         } 
-        nextClusterId = rows; // keeps track of the number of values, initially we have as many clusters as rows
+        nextClusterId = rows; // keeps track of the next cluster id after the original rows
 
         for (int i = 0; i < normalized.length - 1; i++){
-            float smallestDist = Float.MAX_VALUE; //Neat trick I learned from Hanin, float.MAX_VALUE is the largest possible float value, so any distance we calculate will be smaller than this, so we can use this as our initial value for smallestDist
-            int closestRow = -1; // initialize with -1 so it's obvious if something weird happens, thanks again Hanin!
+            float smallestDist = Float.MAX_VALUE; // initial large value
+            int closestRow = -1;
             int closestCol = -1;
             for (int j = 0; j < distanceMatrix.length; j++){
                 for (int k = 0; k < distanceMatrix[0].length; k++){
-                    if (j != k && active[j] == 1 && active[k] == 1){ // we only consider distances between active clusters, and we don't consider the distance of a cluster to itself
+                    if (j != k && active[j] == 1 && active[k] == 1){ // only consider distances between active clusters
                         if (distanceMatrix[j][k] < smallestDist){
-                            smallestDist = distanceMatrix[j][k]; //update smallestDist and closestRow and closestCol if we found a smaller distance
+                            smallestDist = distanceMatrix[j][k];
                             closestRow = j;
                             closestCol = k;
                         }
                     }
                 }
             }
-            if (closestRow == -1 || closestCol == -1){ // sanity check, remove this later!
+            if (closestRow == -1 || closestCol == -1){
                 println("wtf");
             }
             linkageMatrix[i][0] = closestRow;
             linkageMatrix[i][1] = closestCol;
             linkageMatrix[i][2] = smallestDist;
-            linkageMatrix[i][3] = sizes[closestRow] + sizes[closestCol]; // we merged 2 clusters, so the size of the new cluster is 2
-            sizes[nextClusterId] = sizes[closestRow] + sizes[closestCol]; // we merged 2 clusters, so we add the size of the new cluster to the sizes array
+            linkageMatrix[i][3] = sizes[closestRow] + sizes[closestCol];
+            sizes[nextClusterId] = sizes[closestRow] + sizes[closestCol];
             distanceMatrix = updateDistanceMatrix(distanceMatrix, closestRow, closestCol);
-            active[closestRow] = 0; // we merged the cluster at closestRow, so it's no longer active
-            active[closestCol] = 0; // we merged the cluster at closestCol, so it's no longer active
-            active[nextClusterId] = 1; // we merged 2 clusters, so we add the new cluster to the active array
+            active[closestRow] = 0;
+            active[closestCol] = 0;
+            active[nextClusterId] = 1;
             nextClusterId += 1;
         }
         return linkageMatrix;
     } 
+
+    int[] getSortedPatientOrderFromLinkage() {
+        getLinkageMatrix();
+
+        ArrayList<ArrayList<Integer>> clusters = new ArrayList<ArrayList<Integer>>();
+
+        // elke originele patiënt is eerst zijn eigen cluster
+        for (int i = 0; i < rows; i++) {
+            ArrayList<Integer> single = new ArrayList<Integer>();
+            single.add(i);
+            clusters.add(single);
+        }
+
+        // linkageMatrix aflopen
+        for (int step = 0; step < rows - 1; step++) {
+            int a = int(linkageMatrix[step][0]);
+            int b = int(linkageMatrix[step][1]);
+
+            ArrayList<Integer> merged = new ArrayList<Integer>();
+
+            merged.addAll(clusters.get(a));
+            merged.addAll(clusters.get(b));
+
+            clusters.add(merged);
+        }
+
+        // laatste cluster bevat alle patiënten in gesorteerde volgorde
+        ArrayList<Integer> finalCluster = clusters.get(clusters.size() - 1);
+
+        int[] order = new int[rows];
+
+        for (int i = 0; i < rows; i++) {
+            order[i] = finalCluster.get(i);
+        }
+
+        return order;
+    }
 
     float [][] updateDistanceMatrix (float[][] distanceMatrix, int cluster1, int cluster2){ // helper for getLinkagematrix, updating distance matrix. 
         float [][] newDistanceMatrix = new float[distanceMatrix.length + 1][distanceMatrix[0].length + 1];
