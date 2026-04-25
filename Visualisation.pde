@@ -1,4 +1,7 @@
 import processing.event.MouseEvent;
+// =========================
+//  DATA
+// =========================
 
 float[][] values;
 float[][] normalized;
@@ -7,20 +10,33 @@ String[] headers;
 
 int rows;
 int cols;
+// =========================
+//  COLORS
+// =========================
+color lowColor;
+color highColor;
 
-// grading kleuren
-color c1, c2;
+// =========================
+// LAYOUT
+// =========================
 
-// Layout
+// Margins heatmap
 float marginLeft = 360;
 float marginTop = 80;
 float marginRight = 70;
 float marginBottom = 40;
+//Celafmetingen
+float cellH = 24;
+float cellW = 55;
+// Minimale en maximale celhoogte voor het scrollen
+float maxCellH = 50;
+float minCellH = 2;
 
-// Scrollen
+// =========================
+// SCROLLEN
+// =========================
 float scrollY = 0;
 float scrollSpeed = 30;
-
 // Scrollbar (lichtgrijze)
 float scrollbarWidth = 16;
 float scrollbarX;
@@ -31,73 +47,65 @@ float thumbY;
 float thumbH;
 boolean draggingThumb = false;
 float dragOffsetY = 0;
-
-//cellen
-float cellH = 24;
-float cellW = 55;
-float maxCellH = 50;
-float minCellH = 2;
+// =========================
+// SETUP
+// =========================
 
 void setup() {
-  
   size(1200, 720);
 
   // kleuren grading
-  c1 = color(120, 180, 120);
-  c2 = color(180, 80, 80);
+  lowColor = color(120, 180, 120);
+  highColor = color(180, 80, 80);
 
   loadCSV("heart.csv");
 
   calc calculate = new calc(cols, rows, values, headers);
   normalized = calculate.normalize();
-  println(calculate.calculateDistanceMatrix(normalized)[0]);
-  println(calculate.getColumnMax());
-  println(calculate.matchCategoricals());
-  println(calculate.cluster());
-  float[][] linkage = calculate.getLinkageMatrix();
-  println(linkage[0]);
-  println(linkage[1]);
-  println(linkage[2]);
-  println(linkage[3]);
-  println(linkage[4]);
-  println(linkage[5]);
-  println(linkage[120]);
-  println(linkage[295]);
-
 }
+// =========================
+// CSV LADEN
+// =========================
 
-void loadCSV(String heartCSV) { // Deze functie laadt de CSV en zet deze om in een 2D array van floats
-  Table table = loadTable(heartCSV, "header"); // Zorgt ervoor dat de eerste rij als header wordt gezien
-// Remove all rows that contain a "?"
+void loadCSV(String filename) {
+  Table table = loadTable(filename, "header");
+
   headers = table.getColumnTitles();
+
+  // Verwijder rijen met ontbrekende waarden
   for (int r = table.getRowCount() - 1; r >= 0; r--) {
     TableRow row = table.getRow(r);
-
-    boolean hasmissing = false;
+    boolean hasMissingValue = false;
 
     for (int c = 0; c < table.getColumnCount(); c++) {
-      String cell = row.getString(c);
-      if (cell.equals("?")) {
-        hasmissing = true;
+      if (row.getString(c).equals("?")) {
+        hasMissingValue = true;
         break;
       }
     }
 
-    if (hasmissing) {
+    if (hasMissingValue) {
       table.removeRow(r);
     }
   }
-  rows = table.getRowCount(); // Het aantal rijen in de CSV wordt opgeslagen in de variabele 'rows'
-  cols = table.getColumnCount(); // Het aantal kolommen in de CSV wordt opgeslagen in de variabele 'cols'
 
-  values = new float[rows][cols]; // Er wordt een 2D array van floats (getal met decimalen) gemaakt met de afmetingen van het aantal rijen en kolommen
+  rows = table.getRowCount();
+  cols = table.getColumnCount();
 
-  for (int r = 0; r < rows; r++) { // Loop door alle rijen en kolommen en kopieer elke waarde uit de tabel 
+  values = new float[rows][cols];
+
+  for (int r = 0; r < rows; r++) {
     for (int c = 0; c < cols; c++) {
       values[r][c] = table.getFloat(r, c);
     }
   }
 }
+
+// =========================
+// DRAW
+// =========================
+
+//hier gestopt
 float[][] reorderRows(float[][] data, int[] order) {
   float[][] result = new float[order.length][data[0].length];
 
