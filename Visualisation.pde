@@ -3,7 +3,7 @@ import processing.event.MouseEvent;
 float[][] values;
 float[][] normalized;
 
-String[] headers = {"age", "sex", "cp", "trestbps", "chol", "fbs", "restecg", "thalach", "exang", "oldpeak", "slope", "ca", "thal", "target"};
+String[] headers;
 
 int rows;
 int cols;
@@ -48,7 +48,7 @@ void setup() {
 
 
   loadCSV("heart.csv");
-  calc calculate = new calc(cols, rows, values);
+  calc calculate = new calc(cols, rows, values, headers);
   //printArray(calculate.normalize()[0][11]);
   //println(calculate.calculateColumnStds());
   normalized = calculate.normalize();
@@ -59,6 +59,7 @@ void setup() {
 void loadCSV(String heartCSV) { // Deze functie laadt de CSV en zet deze om in een 2D array van floats
   Table table = loadTable(heartCSV, "header"); // Zorgt ervoor dat de eerste rij als header wordt gezien
 // Remove all rows that contain a "?"
+  headers = table.getColumnTitles();
   for (int r = table.getRowCount() - 1; r >= 0; r--) {
     TableRow row = table.getRow(r);
 
