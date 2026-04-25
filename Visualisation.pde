@@ -5,6 +5,8 @@ import processing.event.MouseEvent;
 
 float[][] values;
 float[][] normalized;
+float[][] clusteredRaw;
+float[][] clusteredNorm;
 int[] rowOrder;
 String[] headers;
 
@@ -62,6 +64,13 @@ void setup() {
 
   calc calculate = new calc(cols, rows, values, headers);
   normalized = calculate.normalize();
+  clusteredRaw = calculate.getClusteredRaw();
+  clusteredNorm = calculate.getClusteredNorm();
+  float[][] linkage = new float[rows][cols];
+  linkage = calculate.getLinkageMatrix();
+  println(linkage[0]);
+
+  println(calculate.getSortedPatientOrderFromLinkage());
 }
 // =========================
 // CSV LADEN
@@ -180,7 +189,7 @@ void draw() {
   
 
   
-float val = values[r][c];
+float val = clusteredNorm[r][c];
 color cellColor;
 
 if (headers[c].equals("sex") || headers[c].equals("fbs") ||
@@ -195,7 +204,7 @@ if (headers[c].equals("sex") || headers[c].equals("fbs") ||
 
 } else {
   // numerieke kolommen: gebruik je genormaliseerde waarde
-  float normVal = normalized[r][c];
+  float normVal = clusteredNorm[r][c];
   float norm = map(normVal, -2, 2, 0, 1);
   norm = constrain(norm, 0, 1);
 
@@ -232,7 +241,7 @@ int hoveredRow = -1;
       if (mouseX > x && mouseX < x + cellW &&
           mouseY > y && mouseY < y + cellH) {
           hoveredRow = r;
-        String label = headers[c] + ": " + values[r][c];
+        String label = headers[c] + ": " + clusteredRaw[r][c];
 
      
         float tw = 105;
@@ -398,7 +407,7 @@ void drawPatientOverview(int r) {
   float lineY = y + 40;
 
   for (int c = 0; c < cols; c++) {
-    String txt = headers[c] + ": " + values[r][c];
+    String txt = headers[c] + ": " + clusteredRaw[r][c];
     text(txt, x + 10, lineY);
     lineY += 14;
   }

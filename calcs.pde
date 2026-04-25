@@ -6,7 +6,8 @@ class calc {
     float[][] input;
     float[][] normalized;
     float[][] distanceMatrix;
-    float[][] clustered;
+    float[][] clusteredRaw;
+    float[][] clusteredNorm;
     float[] columnMeans;
     float[] columnStds;
     float[] maxOfColumn;
@@ -26,7 +27,8 @@ class calc {
 
         this.normalized = new float[rows][columns];
         //this.distanceMatrix = new float[rows][rows];
-        this.clustered = new float[rows][columns];
+        this.clusteredRaw = new float[rows][columns];
+        this.clusteredNorm = new float[rows][columns];
         this.columnMeans = new float[columns];
         this.columnStds = new float[columns];
         this.maxOfColumn = new float[columns];
@@ -137,8 +139,16 @@ class calc {
             for(int j = 0; j < normalized.length; j++){ // for each column of the distance matrix
                 float sum = 0;
                 for (int k = 0; k < normalized[0].length; k++){ // for each column of the normalized matrix
+                    if (categorical[k] == true) { // if it's a categorical variable, distance is 0 if they are the same and 1 if they are different. This differs from wikipedia due to it being DISTANCE and not SIMILARITY
+                        if (normalized[i][k] == normalized[j][k]){
+                            sum = sum + 0;
+                        } else {
+                            sum = sum + 1;
+                        }
+                    } else {
                     sum = sum + (abs(normalized[i][k] - normalized[j][k])/(maxOfNormColumn[k]-minOfNormColumn[k])); // Gower's distance: similarity is 1 - (absolute value of the difference between the two values / the maximum of the two values), we want distance -> don't subtract from 1. 
-                }
+                     }
+                    }
                 distanceMatrix[i][j] = sum;
             }
         }
@@ -248,36 +258,28 @@ class calc {
         return newDistanceMatrix;
     }
 
-    int[] cluster() {
-
-        int[] clusters = new int[rows];
-
-        // iedereen start in eigen cluster
-        for (int i = 0; i < rows; i++) {
-            clusters[i] = i;
-        }
-
-        // zoek dichtste buur
-        for (int i = 0; i < rows; i++) {
-
-            float minDist = Float.MAX_VALUE;
-            int closest = -1;
-
-            for (int j = 0; j < rows; j++) {
-
-                if (i != j && distanceMatrix[i][j] < minDist) {
-                    minDist = distanceMatrix[i][j];
-                    closest = j;
+    float[][] getClusteredRaw(){
+        int order[] = new int[rows];
+        order = getSortedPatientOrderFromLinkage();
+            for (int i = 0; i < input.length; i++){
+                for (int j = 0; j < input[0].length; j++){
+                    int requestedRow = order[i];
+                    clusteredRaw[i][j] = input[requestedRow][j];
                 }
             }
+        return clusteredRaw;
+    }
 
-            // zelfde cluster
-            if (closest != -1) {
-                clusters[i] = clusters[closest];
+    float[][] getClusteredNorm(){
+        int order[] = new int[rows];
+        order = getSortedPatientOrderFromLinkage();
+            for (int i = 0; i < input.length; i++){
+                for (int j = 0; j < input[0].length; j++){
+                    int requestedRow = order[i];
+                    clusteredNorm[i][j] = normalized[requestedRow][j];
+                }
             }
-        }
-
-        return clusters;
+        return clusteredNorm;
     }
 
     float[][] normalize(){
