@@ -54,6 +54,7 @@ void setup() {
   normalized = calculate.normalize();
   println(calculate.calculateDistanceMatrix(normalized)[0]);
   println(calculate.maxOfColumn);
+  println(calculate.matchCategoricals());
 }
 
 void loadCSV(String heartCSV) { // Deze functie laadt de CSV en zet deze om in een 2D array van floats
