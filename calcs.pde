@@ -52,6 +52,18 @@ class calc {
         return columnMeans;
     }
 
+    float[] calculateColumnStds(){ // standard deviation
+        calculateColumnMeans();
+        for (int i = 0; i< input[0].length; i++){
+            float sum = 0;
+            for (int j = 0; j < input.length; j++){
+                sum = sum + sq(input[j][i] - columnMeans[i]);
+            }
+            columnStds[i] = sqrt(sum / input.length);
+        }
+        return columnStds;
+    }
+
     float[] getNormColumnMax(){ // gets maximum of each column of normalized data
         normalize();
         for (int i = 0; i < normalized[0].length; i++){
@@ -79,7 +91,7 @@ class calc {
         }
         return minOfNormColumn;
     }
-
+/**
     float[] getColumnMax(){ // gets maximum of each column of input data
         for (int i = 0; i < input[0].length; i++){
             float max = input[0][i];   
@@ -105,8 +117,8 @@ class calc {
         }
         return minOfColumn;
     }
-
-    boolean[] matchCategoricals(){
+*/
+    boolean[] matchCategoricals(){ // checks if it's a categorical variable based on headers, TODO: get this from an array instead of hardcoding this mess
         for (int i = 0; i < columns; i++){
             if (headers[i].equals("sex") || headers[i].equals("fbs") || headers[i].equals("exang") || headers[i].equals("target") || headers[i].equals("cp") || headers[i].equals("restecg") || headers[i].equals("exang") || headers[i].equals("slope") || headers[i].equals("thal")){ // if the column is a categorical variable
                 categorical[i] = true;
@@ -115,18 +127,6 @@ class calc {
             }
         }
         return categorical;
-    }
-
-    float[] calculateColumnStds(){ // standard deviation
-        calculateColumnMeans();
-        for (int i = 0; i< input[0].length; i++){
-            float sum = 0;
-            for (int j = 0; j < input.length; j++){
-                sum = sum + sq(input[j][i] - columnMeans[i]);
-            }
-            columnStds[i] = sqrt(sum / input.length);
-        }
-        return columnStds;
     }
 
     float[][] calculateDistanceMatrix(float[][] normalized){ // calculates distance matrix following gower's for each person
@@ -144,10 +144,6 @@ class calc {
         }
         return distanceMatrix;
     }
-
-    //float[] smallestDistance(){} //TODO
-    
-
     
     float[][] getLinkageMatrix(){ // calculating linkage matrix for single linkage clustering
         calculateDistanceMatrix(normalized);
@@ -191,13 +187,10 @@ class calc {
             active[nextClusterId] = 1; // we merged 2 clusters, so we add the new cluster to the active array
             nextClusterId += 1;
         }
-
-
-
         return linkageMatrix;
     } 
 
-    float [][] updateDistanceMatrix (float[][] distanceMatrix, int cluster1, int cluster2){
+    float [][] updateDistanceMatrix (float[][] distanceMatrix, int cluster1, int cluster2){ // helper for getLinkagematrix, updating distance matrix. 
         float [][] newDistanceMatrix = new float[distanceMatrix.length + 1][distanceMatrix[0].length + 1];
         int oldSize = distanceMatrix.length;
         int newClusterIndex = oldSize; //codex did a weird thing here... I try using it once and it pulls this crap
