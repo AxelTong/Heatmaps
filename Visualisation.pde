@@ -2,7 +2,7 @@ import processing.event.MouseEvent;
 
 float[][] values;
 float[][] normalized;
-
+int[] rowOrder;
 String[] headers;
 
 int rows;
@@ -46,11 +46,9 @@ void setup() {
   c1 = color(120, 180, 120);
   c2 = color(180, 80, 80);
 
-
   loadCSV("heart.csv");
+
   calc calculate = new calc(cols, rows, values, headers);
-  //printArray(calculate.normalize()[0][11]);
-  //println(calculate.calculateColumnStds());
   normalized = calculate.normalize();
   println(calculate.calculateDistanceMatrix(normalized)[0]);
   println(calculate.maxOfColumn);
@@ -96,7 +94,19 @@ void loadCSV(String heartCSV) { // Deze functie laadt de CSV en zet deze om in e
     }
   }
 }
+float[][] reorderRows(float[][] data, int[] order) {
+  float[][] result = new float[order.length][data[0].length];
 
+  for (int newR = 0; newR < order.length; newR++) {
+    int oldR = order[newR];
+
+    for (int col = 0; col < data[0].length; col++) {
+      result[newR][col] = data[oldR][col];
+    }
+  }
+
+  return result;
+}
 void draw() {
   background(245);
   float gridWidth = width - marginLeft - marginRight;
@@ -198,7 +208,7 @@ fill(cellColor);
   rect(318,478,24,204);
   setGradient(320, 480, 20, 200, c1, c2); 
   
-
+int hoveredRow = -1;
   // Hover functie
 
   for (int r = 0; r < rows; r++) {
@@ -209,7 +219,7 @@ fill(cellColor);
 
       if (mouseX > x && mouseX < x + cellW &&
           mouseY > y && mouseY < y + cellH) {
-
+          hoveredRow = r;
         String label = headers[c] + ": " + values[r][c];
 
      
@@ -232,6 +242,9 @@ fill(cellColor);
       
       }
     }
+    if (hoveredRow != -1) {
+  drawPatientOverview(hoveredRow);
+}
   }
 
 
@@ -355,5 +368,27 @@ void updateScrollFromThumb(float newThumbY) {
   thumbY = constrain(newThumbY, scrollbarY, scrollbarY + maxThumbTravel);
   scrollY = map(thumbY, scrollbarY, scrollbarY + maxThumbTravel, 0, maxScrollY);
 }
+void drawPatientOverview(int r) {
+  float x = 20;
+  float y = 400;
+  float w = 300;
+  float h = 250;
 
+  fill(255);
+  stroke(180);
+  rect(x, y, w, h, 8);
+
+  fill(0);
+  textSize(13);
+  text("Patiënt " + r, x + 10, y + 20);
+
+  textSize(10);
+  float lineY = y + 40;
+
+  for (int c = 0; c < cols; c++) {
+    String txt = headers[c] + ": " + values[r][c];
+    text(txt, x + 10, lineY);
+    lineY += 14;
+  }
+}
 
