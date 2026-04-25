@@ -192,7 +192,7 @@ fill(cellColor);
   rect(318,478,24,204);
   setGradient(320, 480, 20, 200, c1, c2); 
   
-
+int hoveredRow = -1;
   // Hover functie
 
   for (int r = 0; r < rows; r++) {
@@ -203,7 +203,7 @@ fill(cellColor);
 
       if (mouseX > x && mouseX < x + cellW &&
           mouseY > y && mouseY < y + cellH) {
-
+          hoveredRow = r;
         String label = headers[c] + ": " + values[r][c];
 
      
@@ -226,6 +226,9 @@ fill(cellColor);
       
       }
     }
+    if (hoveredRow != -1) {
+  drawPatientOverview(hoveredRow);
+}
   }
 
 
@@ -349,5 +352,27 @@ void updateScrollFromThumb(float newThumbY) {
   thumbY = constrain(newThumbY, scrollbarY, scrollbarY + maxThumbTravel);
   scrollY = map(thumbY, scrollbarY, scrollbarY + maxThumbTravel, 0, maxScrollY);
 }
+void drawPatientOverview(int r) {
+  float x = 20;
+  float y = 400;
+  float w = 300;
+  float h = 250;
 
+  fill(255);
+  stroke(180);
+  rect(x, y, w, h, 8);
+
+  fill(0);
+  textSize(13);
+  text("Patiënt " + r, x + 10, y + 20);
+
+  textSize(10);
+  float lineY = y + 40;
+
+  for (int c = 0; c < cols; c++) {
+    String txt = headers[c] + ": " + values[r][c];
+    text(txt, x + 10, lineY);
+    lineY += 14;
+  }
+}
 
