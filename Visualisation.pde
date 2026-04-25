@@ -51,15 +51,19 @@ void setup() {
   calc calculate = new calc(cols, rows, values, headers);
   normalized = calculate.normalize();
   println(calculate.calculateDistanceMatrix(normalized)[0]);
-  println(calculate.maxOfColumn);
+  println(calculate.getColumnMax());
   println(calculate.matchCategoricals());
   println(calculate.cluster());
-  println(calculate.getLinkageMatrix()[0]);
-  println(calculate.getLinkageMatrix()[1]);
-  println(calculate.getLinkageMatrix()[2]);
-  println(calculate.getLinkageMatrix()[3]);
-  println(calculate.getLinkageMatrix()[4]);
-  println(calculate.getLinkageMatrix()[5]);
+  float[][] linkage = calculate.getLinkageMatrix();
+  println(linkage[0]);
+  println(linkage[1]);
+  println(linkage[2]);
+  println(linkage[3]);
+  println(linkage[4]);
+  println(linkage[5]);
+  println(linkage[120]);
+  println(linkage[295]);
+
 }
 
 void loadCSV(String heartCSV) { // Deze functie laadt de CSV en zet deze om in een 2D array van floats

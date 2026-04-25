@@ -2,6 +2,7 @@
 class calc {
     int columns;
     int rows;
+    int nextClusterId;
     float[][] input;
     float[][] normalized;
     float[][] distanceMatrix;
@@ -21,9 +22,10 @@ class calc {
         this.rows = rows;
         this.input = input;
         this.headers = headers;
+        this.nextClusterId = rows;
 
         this.normalized = new float[rows][columns];
-        this.distanceMatrix = new float[rows][rows];
+        //this.distanceMatrix = new float[rows][rows];
         this.clustered = new float[rows][columns];
         this.columnMeans = new float[columns];
         this.columnStds = new float[columns];
@@ -130,6 +132,7 @@ class calc {
     float[][] calculateDistanceMatrix(float[][] normalized){ // calculates distance matrix following gower's for each person
         getNormColumnMax();
         getNormColumnMin();
+        distanceMatrix = new float[normalized.length][normalized.length];
         for(int i = 0; i < normalized.length; i++){ // for each row of the distance matrix
             for(int j = 0; j < normalized.length; j++){ // for each column of the distance matrix
                 float sum = 0;
@@ -146,46 +149,47 @@ class calc {
     
 
     
-    float[][] getLinkageMatrix(){
+    float[][] getLinkageMatrix(){ // calculating linkage matrix for single linkage clustering
         calculateDistanceMatrix(normalized);
-        int[] sizes = new int[rows+1000]; // keeps track of the size of each cluster, initially all clusters are of size 1
+        int maxClusters = 2 * rows - 1; // in the worst case we merge 2 clusters in each step, so we have at most 2*rows-1 clusters, thanks Codex
+        int[] sizes = new int[maxClusters]; // keeps track of the size of each cluster, initially all clusters are of size 1
         for (int i = 0; i < rows; i++){
-            sizes[i] = 1;
+            sizes[i] = 1; // initially all clusters are of size 1, we have as many clusters as rows
         }  
-        int[] active = new int[rows+1000]; // keeps track of which clusters are still active, initially all clusters are active
+        int[] active = new int[maxClusters]; // keeps track of which clusters are still active, initially all clusters are active
         for (int i = 0; i < rows; i++){
             active[i] = 1;
         } 
-        int Count = rows; // keeps track of the number of values, initially we have as many clusters as rows
+        nextClusterId = rows; // keeps track of the number of values, initially we have as many clusters as rows
 
         for (int i = 0; i < normalized.length - 1; i++){
-            float smallestDist = Float.MAX_VALUE;
-            int closestRow = -1;
+            float smallestDist = Float.MAX_VALUE; //Neat trick I learned from Hanin, float.MAX_VALUE is the largest possible float value, so any distance we calculate will be smaller than this, so we can use this as our initial value for smallestDist
+            int closestRow = -1; // initialize with -1 so it's obvious if something weird happens, thanks again Hanin!
             int closestCol = -1;
             for (int j = 0; j < distanceMatrix.length; j++){
                 for (int k = 0; k < distanceMatrix[0].length; k++){
                     if (j != k && active[j] == 1 && active[k] == 1){ // we only consider distances between active clusters, and we don't consider the distance of a cluster to itself
                         if (distanceMatrix[j][k] < smallestDist){
-                            smallestDist = distanceMatrix[j][k];
+                            smallestDist = distanceMatrix[j][k]; //update smallestDist and closestRow and closestCol if we found a smaller distance
                             closestRow = j;
                             closestCol = k;
                         }
                     }
                 }
             }
-            if (closestRow == -1 || closestCol == -1){
-                break;
+            if (closestRow == -1 || closestCol == -1){ // sanity check, remove this later!
+                println("wtf");
             }
             linkageMatrix[i][0] = closestRow;
             linkageMatrix[i][1] = closestCol;
             linkageMatrix[i][2] = smallestDist;
             linkageMatrix[i][3] = sizes[closestRow] + sizes[closestCol]; // we merged 2 clusters, so the size of the new cluster is 2
-            sizes = append(sizes, sizes[closestRow] + sizes[closestCol]); // we merged 2 clusters, so we add the size of the new cluster to the sizes array
+            sizes[nextClusterId] = sizes[closestRow] + sizes[closestCol]; // we merged 2 clusters, so we add the size of the new cluster to the sizes array
             distanceMatrix = updateDistanceMatrix(distanceMatrix, closestRow, closestCol);
             active[closestRow] = 0; // we merged the cluster at closestRow, so it's no longer active
             active[closestCol] = 0; // we merged the cluster at closestCol, so it's no longer active
-            active = append(active, 1); // we merged 2 clusters, so we add the new cluster to the active array
-            Count += 1;
+            active[nextClusterId] = 1; // we merged 2 clusters, so we add the new cluster to the active array
+            nextClusterId += 1;
         }
 
 
@@ -195,19 +199,21 @@ class calc {
 
     float [][] updateDistanceMatrix (float[][] distanceMatrix, int cluster1, int cluster2){
         float [][] newDistanceMatrix = new float[distanceMatrix.length + 1][distanceMatrix[0].length + 1];
-
-        for (int i = 0; i < distanceMatrix.length; i++){
-            for (int j = 0; j < distanceMatrix[0].length; j++){
-                if (i >= distanceMatrix.length){
-                    newDistanceMatrix[i][j] = min(distanceMatrix[cluster1][j], distanceMatrix[cluster2][j]);
-                }
-                else if (j >= distanceMatrix[0].length){
-                    newDistanceMatrix[i][j] = min(distanceMatrix[i][cluster1], distanceMatrix[i][cluster2]);
-                }
-                else {
+        int oldSize = distanceMatrix.length;
+        int newClusterIndex = oldSize; //codex did a weird thing here... I try using it once and it pulls this crap
+        for (int i = 0; i <= oldSize; i++){
+            for (int j = 0; j <= oldSize; j++){
+                if (i < oldSize && j < oldSize) {
                     newDistanceMatrix[i][j] = distanceMatrix[i][j];
+                } else if (i == newClusterIndex && j < oldSize) {
+                    newDistanceMatrix[i][j] = min(distanceMatrix[cluster1][j], distanceMatrix[cluster2][j]);
+                } else if (j == newClusterIndex && i < oldSize) {
+                    newDistanceMatrix[i][j] = min(distanceMatrix[i][cluster1], distanceMatrix[i][cluster2]);
+                } else {
+                    newDistanceMatrix[i][j] = 0;
                 }
-            }
+            }// thanks codex
+
         }
         return newDistanceMatrix;
     }
@@ -256,7 +262,11 @@ class calc {
             else {
                 // Handle numerical variables with z-normalization
                 for (int j = 0; j < input.length; j++){
+                    if(columnStds[i] == 0){ // if the standard deviation is 0, we can't do z-normalization, so we just set the normalized value to 0 (or any constant value, since all values are the same). thanks Codex for the spot
+                        normalized[j][i] = 0;
+                    } else {
                     normalized[j][i] = (input[j][i] - columnMeans[i]) / columnStds[i]; // z normalization
+                    }
                 }
            }
         }
