@@ -14,6 +14,7 @@ class calc {
     float[] minOfNormColumn;
     boolean[] categorical;
     String[] headers;
+    float[][] linkageMatrix;
 
     calc(int columns, int rows, float[][] input, String[] headers) {
         this.columns = columns;
@@ -31,6 +32,7 @@ class calc {
         this.maxOfNormColumn = new float[columns];
         this.minOfNormColumn = new float[columns];
         this.categorical = new boolean[columns];
+        this.linkageMatrix = new float[rows-1][4]; // in each step we merge 2 clusters, so we have rows-1 steps, and we need to store which clusters we merged and the distance between them, so 3 columns
 
     }
 
@@ -143,37 +145,104 @@ class calc {
     //float[] smallestDistance(){} //TODO
     
 
-   int[] cluster() {
+    
+    float[][] getLinkageMatrix(){
+        calculateDistanceMatrix(normalized);
+        int[] sizes = new int[rows+1000]; // keeps track of the size of each cluster, initially all clusters are of size 1
+        for (int i = 0; i < rows; i++){
+            sizes[i] = 1;
+        }  
+        int[] active = new int[rows+1000]; // keeps track of which clusters are still active, initially all clusters are active
+        for (int i = 0; i < rows; i++){
+            active[i] = 1;
+        } 
+        int Count = rows; // keeps track of the number of values, initially we have as many clusters as rows
 
-    int[] clusters = new int[rows];
+        for (int i = 0; i < normalized.length - 1; i++){
+            float smallestDist = Float.MAX_VALUE;
+            int closestRow = -1;
+            int closestCol = -1;
+            for (int j = 0; j < distanceMatrix.length; j++){
+                for (int k = 0; k < distanceMatrix[0].length; k++){
+                    if (j != k && active[j] == 1 && active[k] == 1){ // we only consider distances between active clusters, and we don't consider the distance of a cluster to itself
+                        if (distanceMatrix[j][k] < smallestDist){
+                            smallestDist = distanceMatrix[j][k];
+                            closestRow = j;
+                            closestCol = k;
+                        }
+                    }
+                }
+            }
+            if (closestRow == -1 || closestCol == -1){
+                break;
+            }
+            linkageMatrix[i][0] = closestRow;
+            linkageMatrix[i][1] = closestCol;
+            linkageMatrix[i][2] = smallestDist;
+            linkageMatrix[i][3] = sizes[closestRow] + sizes[closestCol]; // we merged 2 clusters, so the size of the new cluster is 2
+            sizes = append(sizes, sizes[closestRow] + sizes[closestCol]); // we merged 2 clusters, so we add the size of the new cluster to the sizes array
+            distanceMatrix = updateDistanceMatrix(distanceMatrix, closestRow, closestCol);
+            active[closestRow] = 0; // we merged the cluster at closestRow, so it's no longer active
+            active[closestCol] = 0; // we merged the cluster at closestCol, so it's no longer active
+            active = append(active, 1); // we merged 2 clusters, so we add the new cluster to the active array
+            Count += 1;
+        }
 
-    // iedereen start in eigen cluster
-    for (int i = 0; i < rows; i++) {
-        clusters[i] = i;
+
+
+        return linkageMatrix;
+    } 
+
+    float [][] updateDistanceMatrix (float[][] distanceMatrix, int cluster1, int cluster2){
+        float [][] newDistanceMatrix = new float[distanceMatrix.length + 1][distanceMatrix[0].length + 1];
+
+        for (int i = 0; i < distanceMatrix.length; i++){
+            for (int j = 0; j < distanceMatrix[0].length; j++){
+                if (i >= distanceMatrix.length){
+                    newDistanceMatrix[i][j] = min(distanceMatrix[cluster1][j], distanceMatrix[cluster2][j]);
+                }
+                else if (j >= distanceMatrix[0].length){
+                    newDistanceMatrix[i][j] = min(distanceMatrix[i][cluster1], distanceMatrix[i][cluster2]);
+                }
+                else {
+                    newDistanceMatrix[i][j] = distanceMatrix[i][j];
+                }
+            }
+        }
+        return newDistanceMatrix;
     }
 
-    // zoek dichtste buur
-    for (int i = 0; i < rows; i++) {
+    int[] cluster() {
 
-        float minDist = Float.MAX_VALUE;
-        int closest = -1;
+        int[] clusters = new int[rows];
 
-        for (int j = 0; j < rows; j++) {
+        // iedereen start in eigen cluster
+        for (int i = 0; i < rows; i++) {
+            clusters[i] = i;
+        }
 
-            if (i != j && distanceMatrix[i][j] < minDist) {
-                minDist = distanceMatrix[i][j];
-                closest = j;
+        // zoek dichtste buur
+        for (int i = 0; i < rows; i++) {
+
+            float minDist = Float.MAX_VALUE;
+            int closest = -1;
+
+            for (int j = 0; j < rows; j++) {
+
+                if (i != j && distanceMatrix[i][j] < minDist) {
+                    minDist = distanceMatrix[i][j];
+                    closest = j;
+                }
+            }
+
+            // zelfde cluster
+            if (closest != -1) {
+                clusters[i] = clusters[closest];
             }
         }
 
-        // zelfde cluster
-        if (closest != -1) {
-            clusters[i] = clusters[closest];
-        }
+        return clusters;
     }
-
-    return clusters;
-}
 
     float[][] normalize(){
         calculateColumnStds();

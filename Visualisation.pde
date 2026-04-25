@@ -56,6 +56,12 @@ void setup() {
   println(calculate.maxOfColumn);
   println(calculate.matchCategoricals());
   println(calculate.cluster());
+  println(calculate.getLinkageMatrix()[0]);
+  println(calculate.getLinkageMatrix()[1]);
+  println(calculate.getLinkageMatrix()[2]);
+  println(calculate.getLinkageMatrix()[3]);
+  println(calculate.getLinkageMatrix()[4]);
+  println(calculate.getLinkageMatrix()[5]);
 }
 
 void loadCSV(String heartCSV) { // Deze functie laadt de CSV en zet deze om in een 2D array van floats
