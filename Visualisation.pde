@@ -7,6 +7,7 @@ float[][] values;
 float[][] normalized;
 float[][] clusteredRaw;
 float[][] clusteredNorm;
+float[][] linkage;
 int[] rowOrder;
 String[] headers;
 boolean[] categorical;
@@ -156,30 +157,49 @@ void draw() {
   fill(0);
   text("by Axel Tong, Hanin El Tabaa and Maarten De Feyter", 10, height - 20);
 
-  // legend
-   textSize(10);
+  // Legend "box""
+  float lx = 20;
+  float ly = marginTop;
+  float lw = 300;
+  float lh = 260;
+
+  noStroke();
+  fill(255, 240);
+  rect(lx, ly, lw, lh, 12);
+
+  stroke(180);
+  noFill();
+  rect(lx, ly, lw, lh, 12);
+
   fill(0);
-  text("age = Age in years", 10, 20 + marginTop);
-  text("sex = Sex (1 = male; 0 = female)", 10, 40 + marginTop);
-  text("cp = Chest pain type (0-3)", 10, 60 + marginTop);
-  text("trestbps = Resting blood pressure", 10, 80 + marginTop);
-  text("chol = Serum cholesterol", 10, 100 + marginTop);
-  text("fbs = Fasting blood sugar", 10, 120 + marginTop);
-  text("restecg = Resting electrocardiographic results", 10, 140 + marginTop);
-  text("thalach = Maximum heart rate achieved", 10, 160 + marginTop);
-  text("exang = Exercise induced angina", 10, 180 + marginTop);
-  text("oldpeak = ST depression induced by exercise relative to rest", 10,
-  200 + marginTop);
-  text("slope = The slope of the peak exercise ST segment", 10,
-  220 + marginTop);
-  text("ca = Number of major vessels (0-3) colored by flouroscopy", 10, 240 + marginTop);
-  text("thal = Thalassemia", 10, 260 + marginTop);
-  text("target = 1 or 0 (disease or no disease)", 10, 280 + marginTop);   
+  textSize(13);
+  text("Legend", lx + 12, ly + 20);
 
+  textSize(10);
+  float lyy = ly + 40;
 
+  String[] legendLines = {
+    "age = Age in years",
+    "sex = 1 male, 0 female",
+    "cp = Chest pain type (0–3)",
+    "trestbps = Resting blood pressure",
+    "chol = Serum cholesterol",
+    "fbs = Fasting blood sugar",
+    "restecg = Resting ECG results",
+    "thalach = Max heart rate",
+    "exang = Exercise-induced angina",
+    "oldpeak = ST depression",
+    "slope = ST segment slope",
+    "ca = Major vessels (0–3)",
+    "thal = Thalassemia",
+    "target = 1 disease, 0 no disease"
+  };
 
- 
-
+  for (String line : legendLines) {
+    text(line, lx + 12, lyy);
+    lyy += 14;
+  }
+    
 
   // Heatmap achtergrond + aflijning
   fill(0);
@@ -209,6 +229,10 @@ fill(cellColor);
       float x = marginLeft + c * cellW;
       float y = marginTop + r * cellH - scrollY;
       rect(x, y, cellW, cellH);
+      stroke(200, 80);   // light grey
+      strokeWeight(1);
+      line(marginLeft, marginTop + r * cellH - scrollY, marginLeft + gridWidth, marginTop + r * cellH - scrollY);
+
     }
   }
 
@@ -380,21 +404,30 @@ void updateScrollFromThumb(float newThumbY) {
   thumbY = constrain(newThumbY, scrollbarY, scrollbarY + maxThumbTravel);
   scrollY = map(thumbY, scrollbarY, scrollbarY + maxThumbTravel, 0, maxScrollY);
 }
+
+// =========================
+//  PATIENT OVERVIEW
+// =========================
 void drawPatientOverview(int r) {
   float x = 20;
   float y = 400;
-  float w = 300;
+  float w = 200;
   float h = 250;
-
-  fill(255);
+// card background 
+  noStroke();
+  fill(255, 240);    // slightly transparent white
+  rect(x, y, w, h, 12);
+// card border
   stroke(180);
-  rect(x, y, w, h, 8);
-
+  strokeWeight(1);
+  noFill();
+  rect(x, y, w, h, 12);
+//title 
   fill(0);
   textSize(13);
   text("Patiënt " + r, x + 10, y + 20);
 
-  textSize(10);
+  textSize(11);
   float lineY = y + 40;
 
   for (int c = 0; c < cols; c++) {
@@ -403,4 +436,3 @@ void drawPatientOverview(int r) {
     lineY += 14;
   }
 }
-
