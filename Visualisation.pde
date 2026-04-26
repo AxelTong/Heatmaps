@@ -9,6 +9,9 @@ float[][] clusteredRaw;
 float[][] clusteredNorm;
 int[] rowOrder;
 String[] headers;
+boolean[] categorical;
+float[] normMin;
+float[] normMax;
 
 int rows;
 int cols;
@@ -63,9 +66,12 @@ void setup() {
   loadCSV("heart.csv");
 
   calc calculate = new calc(cols, rows, values, headers);
+  categorical = calculate.matchCategoricals();
   normalized = calculate.normalize();
   clusteredRaw = calculate.getClusteredRaw();
   clusteredNorm = calculate.getClusteredNorm();
+  normMax = calculate.getNormColumnMax();
+  normMin = calculate.getNormColumnMin(); 
   float[][] linkage = new float[rows][cols];
   linkage = calculate.getLinkageMatrix();
   println(linkage[0]);
@@ -186,30 +192,15 @@ void draw() {
   noStroke();
   for (int r = 0; r < rows; r++) {
     for (int c = 0; c < cols; c++) {
-  
 
-  
-float val = clusteredNorm[r][c];
-color cellColor;
+  color cellColor;
 
-if (headers[c].equals("sex") || headers[c].equals("fbs") ||
-    headers[c].equals("exang") || headers[c].equals("target")) {
-
-  // categorische of binaire kolommen: vaste kleuren
-  if (val == 1) {
-    cellColor = color(120, 180, 120);      
-  } else {
-    cellColor = color(180, 80, 80);     
-  }
-
-} else {
-  // numerieke kolommen: gebruik je genormaliseerde waarde
   float normVal = clusteredNorm[r][c];
-  float norm = map(normVal, -2, 2, 0, 1);
+  float norm = map(normVal, normMin[c], normMax[c], 0, 1);
   norm = constrain(norm, 0, 1);
 
   cellColor = lerpColor(lowColor, highColor, norm);
-}
+
 
 fill(cellColor);
 
