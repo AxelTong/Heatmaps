@@ -75,7 +75,7 @@ void setup() {
   normMin = calculate.getNormColumnMin(); 
   float[][] linkage = new float[rows][cols];
   linkage = calculate.getLinkageMatrix();
-  println(linkage[0]);
+  println(linkage[200]);
 
   println(calculate.getSortedPatientOrderFromLinkage());
 }

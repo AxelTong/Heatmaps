@@ -66,33 +66,6 @@ class calc {
         return columnStds;
     }
 
-    float[] getNormColumnMax(){ // gets maximum of each column of normalized data
-        normalize();
-        for (int i = 0; i < normalized[0].length; i++){
-            float max = normalized[0][i];
-            for(int j = 0; j < normalized.length; j++){
-                if (normalized[j][i] > max){
-                    max = normalized[j][i];
-                }
-            }
-            maxOfNormColumn[i] = max;
-        }
-        return maxOfNormColumn;
-    }
-
-    float[] getNormColumnMin(){ // gets minimum of each column of normalized data
-        normalize();
-        for (int i = 0; i < normalized[0].length; i++){
-            float min = normalized[0][i];
-            for(int j = 0; j < normalized.length; j++){
-                if (normalized[j][i] < min){
-                    min = normalized[j][i];
-                }
-            }
-            minOfNormColumn[i] = min;
-        }
-        return minOfNormColumn;
-    }
 /**
     float[] getColumnMax(){ // gets maximum of each column of input data
         for (int i = 0; i < input[0].length; i++){
@@ -129,6 +102,57 @@ class calc {
             }
         }
         return categorical;
+    }
+
+    float[][] normalize(){
+        calculateColumnStds();
+        for (int i = 0; i < input[0].length; i++){
+            if (matchCategoricals()[i]) {
+                // Handle categorical variables differently
+                for (int j = 0; j < input.length; j++){
+                normalized[j][i] = input[j][i];
+                }
+            }
+            else {
+                // Handle numerical variables with z-normalization
+                for (int j = 0; j < input.length; j++){
+                    if(columnStds[i] == 0){ // if the standard deviation is 0, we can't do z-normalization, so we just set the normalized value to 0 (or any constant value, since all values are the same). thanks Codex for the spot
+                        normalized[j][i] = 0;
+                    } else {
+                    normalized[j][i] = (input[j][i] - columnMeans[i]) / columnStds[i]; // z normalization
+                    }
+                }
+           }
+        }
+        return normalized;
+    }
+
+    float[] getNormColumnMax(){ // gets maximum of each column of normalized data
+        normalize();
+        for (int i = 0; i < normalized[0].length; i++){
+            float max = normalized[0][i];
+            for(int j = 0; j < normalized.length; j++){
+                if (normalized[j][i] > max){
+                    max = normalized[j][i];
+                }
+            }
+            maxOfNormColumn[i] = max;
+        }
+        return maxOfNormColumn;
+    }
+
+    float[] getNormColumnMin(){ // gets minimum of each column of normalized data
+        normalize();
+        for (int i = 0; i < normalized[0].length; i++){
+            float min = normalized[0][i];
+            for(int j = 0; j < normalized.length; j++){
+                if (normalized[j][i] < min){
+                    min = normalized[j][i];
+                }
+            }
+            minOfNormColumn[i] = min;
+        }
+        return minOfNormColumn;
     }
 
     float[][] calculateDistanceMatrix(float[][] normalized){ // calculates distance matrix following gower's for each person
@@ -281,27 +305,5 @@ class calc {
         return clusteredNorm;
     }
 
-    float[][] normalize(){
-        calculateColumnStds();
-        for (int i = 0; i < input[0].length; i++){
-            if (matchCategoricals()[i]) {
-                // Handle categorical variables differently
-                for (int j = 0; j < input.length; j++){
-                normalized[j][i] = input[j][i];
-                }
-            }
-            else {
-                // Handle numerical variables with z-normalization
-                for (int j = 0; j < input.length; j++){
-                    if(columnStds[i] == 0){ // if the standard deviation is 0, we can't do z-normalization, so we just set the normalized value to 0 (or any constant value, since all values are the same). thanks Codex for the spot
-                        normalized[j][i] = 0;
-                    } else {
-                    normalized[j][i] = (input[j][i] - columnMeans[i]) / columnStds[i]; // z normalization
-                    }
-                }
-           }
-        }
-        return normalized;
-    }
 
 }
