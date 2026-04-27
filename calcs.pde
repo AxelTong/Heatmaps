@@ -1,5 +1,11 @@
-//check todo at bottom
+//============================================
+// Class: calc
+// Description of this class: this class performs normalization, Gower distance, hierarchical clustering, linkage matrix, and patient order for heatmap visualization. It takes in the raw data and headers as input and outputs the clustered raw and normalized data, as well as the distance matrix and linkage matrix for clustering.
+//============================================
 class calc {
+    // --------------------------------
+    // FIELDS
+    //--------------------------------
     int columns;
     int rows;
     int nextClusterId;
@@ -8,41 +14,55 @@ class calc {
     float[][] distanceMatrix;
     float[][] clusteredRaw;
     float[][] clusteredNorm;
+
     float[] columnMeans;
     float[] columnStds;
+
     float[] maxOfColumn;
     float[] minOfColumn;
     float[] maxOfNormColumn;
     float[] minOfNormColumn;
+
     boolean[] categorical;
     String[] headers;
-    float[][] linkageMatrix;
 
+    float[][] linkageMatrix;
+    //================================
+    // CONSTRUCTOR
+    //================================
     calc(int columns, int rows, float[][] input, String[] headers) {
         this.columns = columns;
         this.rows = rows;
         this.input = input;
         this.headers = headers;
+
         this.nextClusterId = rows;
 
         this.normalized = new float[rows][columns];
-        //this.distanceMatrix = new float[rows][rows];
         this.clusteredRaw = new float[rows][columns];
         this.clusteredNorm = new float[rows][columns];
+
         this.columnMeans = new float[columns];
         this.columnStds = new float[columns];
+
         this.maxOfColumn = new float[columns];
         this.minOfColumn = new float[columns];
         this.maxOfNormColumn = new float[columns];
         this.minOfNormColumn = new float[columns];
+
         this.categorical = new boolean[columns];
-        this.linkageMatrix = new float[rows-1][4]; // in each step we merge 2 clusters, so we have rows-1 steps, and we need to store which clusters we merged and the distance between them, so 3 columns
+        
+        this.linkageMatrix = new float[rows-1][5]; // in each step we merge 2 clusters, so we have rows-1 steps, and we need to store which clusters we merged and the distance between them, so 3 columns
 
     }
 
                     // it's [column][row] not [row][column] dumb me
                     // outputs mean of column, row stays the same
+    //======================================================
+    // COLUMN CALCULATIONS: MEAN, STD, MAX, MIN, NORMALIZATION
+    //======================================================
 
+    //Compute mean of each colomn 
     float[] calculateColumnMeans(){ // mathematical average
         for (int i = 0; i < input[0].length; i++){
             float sum = 0;
@@ -53,7 +73,7 @@ class calc {
         }
         return columnMeans;
     }
-
+    // Compute standard deviation of each column
     float[] calculateColumnStds(){ // standard deviation
         calculateColumnMeans();
         for (int i = 0; i< input[0].length; i++){
@@ -65,34 +85,9 @@ class calc {
         }
         return columnStds;
     }
+    //====================================================
+    // CATEGORICAL CHECK, NORMALIZATION, MAX, MIN
 
-/**
-    float[] getColumnMax(){ // gets maximum of each column of input data
-        for (int i = 0; i < input[0].length; i++){
-            float max = input[0][i];   
-            for(int j = 0; j < input.length; j++){
-                if (input[j][i] > max){
-                    max = input[j][i];
-                }
-            }
-            maxOfColumn[i] = max;
-        }
-        return maxOfColumn;
-    }
-
-    float[] getColumnMin(){ // gets minimum of each column of input data
-        for (int i = 0; i < input[0].length; i++){
-            float min = input[0][i];
-            for(int j = 0; j < input.length; j++){
-                if (input[j][i] < min){
-                    min = input[j][i];
-                }
-            }
-            minOfColumn[i] = min;
-        }
-        return minOfColumn;
-    }
-*/
     boolean[] matchCategoricals(){ // checks if it's a categorical variable based on headers, TODO: get this from an array instead of hardcoding this mess
         for (int i = 0; i < columns; i++){
             if (headers[i].equals("sex") || headers[i].equals("fbs") || headers[i].equals("exang") || headers[i].equals("target") || headers[i].equals("cp") || headers[i].equals("restecg") || headers[i].equals("exang") || headers[i].equals("slope") || headers[i].equals("thal")){ // if the column is a categorical variable
@@ -103,12 +98,14 @@ class calc {
         }
         return categorical;
     }
-
+    //====================================================
+    // NORMALIZATION: for numerical variables we do z-normalization, for categorical variables we keep them the same (since Gower's distance can handle categorical variables without needing to convert them to dummy variables or anything)
+    //====================================================
     float[][] normalize(){
         calculateColumnStds();
         for (int i = 0; i < input[0].length; i++){
             if (matchCategoricals()[i]) {
-                // Handle categorical variables differently
+                // Categorical so we can copy raw values 
                 for (int j = 0; j < input.length; j++){
                 normalized[j][i] = input[j][i];
                 }
@@ -126,7 +123,9 @@ class calc {
         }
         return normalized;
     }
-
+    //====================================================
+    // MAX AND MIN OF NORMALIZED COLUMNS: needed for Gower's distance, we need to know the range of the normalized values for each column to calculate the distance correctly. 
+    //====================================================
     float[] getNormColumnMax(){ // gets maximum of each column of normalized data
         normalize();
         for (int i = 0; i < normalized[0].length; i++){
@@ -146,15 +145,15 @@ class calc {
         for (int i = 0; i < normalized[0].length; i++){
             float min = normalized[0][i];
             for(int j = 0; j < normalized.length; j++){
-                if (normalized[j][i] < min){
-                    min = normalized[j][i];
-                }
+                if (normalized[j][i] < min) min = normalized[j][i];
             }
             minOfNormColumn[i] = min;
         }
         return minOfNormColumn;
     }
-
+    //====================================================
+    // GOWER'S DISTANCE AND DISTANCE MATRIX: for each pair of patients, we calculate the Gower distance based on their normalized values and whether the variable is categorical or numerical. For numerical variables, the distance is the absolute difference divided by the range (max - min) of that variable. For categorical variables, the distance is 0 if they are the same and 1 if they are different. We then sum the distances for all variables to get the total distance between the two patients. We do this for all pairs of patients to get the distance matrix.
+    //====================================================
     float[][] calculateDistanceMatrix(float[][] normalized){ // calculates distance matrix following gower's for each person
         getNormColumnMax();
         getNormColumnMin();
@@ -163,22 +162,24 @@ class calc {
             for(int j = 0; j < normalized.length; j++){ // for each column of the distance matrix
                 float sum = 0;
                 for (int k = 0; k < normalized[0].length; k++){ // for each column of the normalized matrix
-                    if (categorical[k] == true) { // if it's a categorical variable, distance is 0 if they are the same and 1 if they are different. This differs from wikipedia due to it being DISTANCE and not SIMILARITY
-                        if (normalized[i][k] == normalized[j][k]){
-                            sum = sum + 0;
-                        } else {
-                            sum = sum + 1;
-                        }
+                if (categorical[k]) {
+                        // Categorical distance: 0 if same, 1 if different
+                        sum += (normalized[i][k] == normalized[j][k]) ? 0 : 1;
                     } else {
-                    sum = sum + (abs(normalized[i][k] - normalized[j][k])/(maxOfNormColumn[k]-minOfNormColumn[k])); // Gower's distance: similarity is 1 - (absolute value of the difference between the two values / the maximum of the two values), we want distance -> don't subtract from 1. 
-                     }
+                        // Numerical Gower distance
+                        sum += abs(normalized[i][k] - normalized[j][k]) /
+                               (maxOfNormColumn[k] - minOfNormColumn[k]);
                     }
+                }
                 distanceMatrix[i][j] = sum;
             }
         }
         return distanceMatrix;
     }
-    
+    //====================================================
+    // HIERARCHICAL CLUSTERING: we use single linkage clustering, which means that the distance between two clusters is the minimum distance between any two patients in the two clusters. We start
+    // with each patient as their own cluster, and then we merge the two closest clusters until we have only one cluster left. We keep track of the clusters we merge and the distance between them in the linkage matrix, which we can then use to get the order of the patients for the heatmap visualization.
+    //====================================================
     float[][] getLinkageMatrix(){ // calculating linkage matrix for single linkage clustering
         calculateDistanceMatrix(normalized);
         int maxClusters = 2 * rows - 1; // in the worst case we merge 2 clusters in each step
@@ -211,57 +212,28 @@ class calc {
             linkageMatrix[i][0] = closestRow; // set first link as row of distance matrix = cluster ID of one
             linkageMatrix[i][1] = closestCol; // set second link as column of distance matrix = cluster ID of the other
             linkageMatrix[i][2] = smallestDist; // distance = distance...
+
             int newSize = sizes[closestRow] + sizes[closestCol]; //size of new cluster is the sum of the sizes of the merged clusters
             linkageMatrix[i][3] = newSize; // set size in linkage matrix
+            linkageMatrix[i][4] = nextClusterId; // new cluster ID is the next available ID after the original rows and previously merged clusters
+
             sizes[nextClusterId] = newSize; // set size of new cluster in sizes array
+            //Update distance matrix and active clusters after merging
             distanceMatrix = updateDistanceMatrix(distanceMatrix, closestRow, closestCol); // update distance matrix after merging clusters
+            //Update active clusters
             active[closestRow] = 0; // set merged clusters as inactive
             active[closestCol] = 0; // set merged clusters as inactive
             active[nextClusterId] = 1; // set new cluster as active
-            nextClusterId += 1; // increment next cluster ID for the next merge. maybe i+rows could work too? This is good enough imo
+
+            nextClusterId++; // the new cluster ID for the next merge, we increment it after each merge so that we have unique IDs for each cluster.
         }
         return linkageMatrix;
     } 
-       
-
-    int[] getSortedPatientOrderFromLinkage() {
-        getLinkageMatrix();
-
-        ArrayList<ArrayList<Integer>> clusters = new ArrayList<ArrayList<Integer>>();
-
-        // elke originele patiënt is eerst zijn eigen cluster
-        for (int i = 0; i < rows; i++) {
-            ArrayList<Integer> single = new ArrayList<Integer>();
-            single.add(i);
-            clusters.add(single);
-        }
-
-        // linkageMatrix aflopen
-        for (int step = 0; step < rows - 1; step++) {
-            int a = int(linkageMatrix[step][0]);
-            int b = int(linkageMatrix[step][1]);
-
-            ArrayList<Integer> merged = new ArrayList<Integer>();
-
-            merged.addAll(clusters.get(a));
-            merged.addAll(clusters.get(b));
-
-            clusters.add(merged);
-        }
-
-        // laatste cluster bevat alle patiënten in gesorteerde volgorde
-        ArrayList<Integer> finalCluster = clusters.get(clusters.size() - 1);
-
-        int[] order = new int[rows];
-
-        for (int i = 0; i < rows; i++) {
-            order[i] = finalCluster.get(i);
-        }
-
-        return order;
-    }
-
+   //====================================================
+   // UPDATE DISTANCE MATRIX: after merging two clusters, we need to update the distance matrix    
+   //=====================================================
     float [][] updateDistanceMatrix (float[][] distanceMatrix, int cluster1, int cluster2){ // helper for getLinkagematrix, updating distance matrix. 
+       
         float [][] newDistanceMatrix = new float[distanceMatrix.length + 1][distanceMatrix[0].length + 1];
         int oldSize = distanceMatrix.length;
         int newClusterIndex = oldSize; //codex did a weird thing here... I try using it once and it pulls this crap
@@ -281,26 +253,67 @@ class calc {
         }
         return newDistanceMatrix;
     }
+    //====================================================
+    // GET SORTED PATIENT ORDER FROM LINKAGE: after we have the linkage matrix,
+    //=====================================================
+int[] getSortedPatientOrderFromLinkage() {
 
+        getLinkageMatrix();
+        HashMap<Integer, ArrayList<Integer>> clusterMap = new HashMap<Integer, ArrayList<Integer>>();
+        // we will keep track of the clusters in a list, where each cluster is a list of patient indices. We start with each patient as their own cluster, and then we merge clusters according to the linkage matrix.
+        for (int i = 0; i < rows; i++) {
+            ArrayList<Integer> single = new ArrayList<Integer>();
+            single.add(i);
+            clusterMap.put(i, single);
+        }
+        int currentClusterId = rows;
+
+        // Process merges in the linkage matrix
+        for (int step = 0; step < rows - 1; step++) {
+
+            int a = int(linkageMatrix[step][0]);
+            int b = int(linkageMatrix[step][1]);
+
+            ArrayList<Integer> merged = new ArrayList<Integer>();
+
+            merged.addAll(clusterMap.get(a));
+            merged.addAll(clusterMap.get(b));
+
+            clusterMap.put(currentClusterId, merged);
+            clusterMap.put(currentClusterId, merged);
+            currentClusterId++;
+        }
+
+        // final cluster bevat alle patiënten in gesorteerde volgorde
+
+       int finalClusterId = currentClusterId - 1;
+        ArrayList<Integer> finalCluster = clusterMap.get(finalClusterId);
+
+        int[] order = new int[rows];
+        for (int i = 0; i < rows; i++) {
+            order[i] = finalCluster.get(i);
+        }
+
+        return order;
+    }
+    //====================================================
+    // GET CLUSTERED RAW AND NORM DATA: using the order of patients from the
+    //=====================================================
     float[][] getClusteredRaw(){
-        int order[] = new int[rows];
-        order = getSortedPatientOrderFromLinkage();
+        int[] order = getSortedPatientOrderFromLinkage();
             for (int i = 0; i < input.length; i++){
                 for (int j = 0; j < input[0].length; j++){
-                    int requestedRow = order[i];
-                    clusteredRaw[i][j] = input[requestedRow][j];
+                    clusteredRaw[i][j] = input[order[i]][j];
                 }
             }
         return clusteredRaw;
     }
 
     float[][] getClusteredNorm(){
-        int order[] = new int[rows];
-        order = getSortedPatientOrderFromLinkage();
+        int[] order = getSortedPatientOrderFromLinkage();
             for (int i = 0; i < input.length; i++){
                 for (int j = 0; j < input[0].length; j++){
-                    int requestedRow = order[i];
-                    clusteredNorm[i][j] = normalized[requestedRow][j];
+                    clusteredNorm[i][j] = normalized[order[i]][j];
                 }
             }
         return clusteredNorm;
