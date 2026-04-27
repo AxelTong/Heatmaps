@@ -117,11 +117,6 @@ void loadCSV(String filename) {
   }
 }
 
-// =========================
-// DRAW
-// =========================
-
-//hier gestopt
 float[][] reorderRows(float[][] data, int[] order) {
   float[][] result = new float[order.length][data[0].length];
 
@@ -135,6 +130,10 @@ float[][] reorderRows(float[][] data, int[] order) {
 
   return result;
 }
+
+// =========================
+// DRAW
+// =========================
 void draw() {
   background(245);
   float gridWidth = width - marginLeft - marginRight;
@@ -157,7 +156,9 @@ void draw() {
   fill(0);
   text("by Axel Tong, Hanin El Tabaa and Maarten De Feyter", 10, height - 20);
 
-  // Legend "box""
+// =========================
+// LEGEND BOX
+// =========================
   float lx = 20;
   float ly = marginTop;
   float lw = 300;
@@ -201,15 +202,18 @@ void draw() {
   }
     
 
-  // Heatmap achtergrond + aflijning
-  fill(0);
-  rect(marginLeft - 2, marginTop - 2, gridWidth + 4, gridHeight + 4);
+// =========================
+// HEATMAP CELLS + SCROLLBAR + HOVER
+// =========================
+  
+// BOARDER HEATMAP
+fill(0);
+rect(marginLeft - 2, marginTop - 2, gridWidth + 4, gridHeight + 4);
 
-  // ik heb de 'viewport' aangeduid met de reeds bepaalde integers; deze kunnen vrij simpel worden aangepast indien nodig. De clip-functie maakt dit simpel
-  clip((int)marginLeft, (int)marginTop, (int)gridWidth, (int)gridHeight);
+// CELLEN AANKLEUREN 
+ clip((int)marginLeft, (int)marginTop, (int)gridWidth, (int)gridHeight);
 
-  // Heatmap cellen kleuren, 
-  noStroke();
+ noStroke();
   for (int r = 0; r < rows; r++) {
     for (int c = 0; c < cols; c++) {
 
@@ -224,8 +228,8 @@ void draw() {
 
 fill(cellColor);
 
+// CELLEN TEKENEN
 
-      // De 'scrollY' is where the magic happens wat betreft scrollfunctie; deze hangt af van het scrollen
       float x = marginLeft + c * cellW;
       float y = marginTop + r * cellH - scrollY;
       rect(x, y, cellW, cellH);
@@ -238,14 +242,14 @@ fill(cellColor);
 
   noClip();
 
-  // grading + rand
   
   fill(0);
   rect(318,478,24,204);
   setGradient(320, 480, 20, 200, lowColor, highColor); 
   
 int hoveredRow = -1;
-  // Hover functie
+
+// HOVER + PT OVERVIEW
 
   for (int r = 0; r < rows; r++) {
     for (int c = 0; c < cols; c++) {
@@ -283,17 +287,9 @@ int hoveredRow = -1;
 }
   }
 
-
-
-    
-
-
-  // Boord rond heatmap
-  noFill();
-  stroke(180);
-  rect(marginLeft, marginTop, gridWidth, gridHeight);
-
-  // Scrollbar 'track', heb ze voorlopig grijs gemaakt (230)
+// =========================
+// SCROLL
+// =========================
   scrollbarX = marginLeft + gridWidth + 20;
   scrollbarY = marginTop;
   scrollbarH = gridHeight;
@@ -302,12 +298,9 @@ int hoveredRow = -1;
   fill(230);
   rect(scrollbarX, scrollbarY, scrollbarWidth, scrollbarH, 8);
 
-  // grootte v thumb berekenenn past zich aan aan het aantal rijen
-  float visibleRatio = gridHeight / HeightAllCells;
-  thumbH = max(40, scrollbarH * visibleRatio);
+  float visibleRatio = gridHeight / HeightAllCells; 
+  thumbH = max(40, scrollbarH * visibleRatio); // thumb past zich aan wanneer er wordt in- of uitgezoomd, minimale hoogte is 40
 
-
-  //
   float maxThumb = scrollbarH - thumbH;
 
   if (maxScrollY == 0) {
@@ -320,6 +313,11 @@ int hoveredRow = -1;
   fill(draggingThumb ? 120 : 150);
   rect(scrollbarX, thumbY, scrollbarWidth, thumbH, 8);
 }
+
+// =========================
+// END DRAW
+// =========================
+
 
 //  color grading
 void setGradient(int x, int y, float w, float h, color c1, color c2) {
