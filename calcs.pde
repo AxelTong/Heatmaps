@@ -182,23 +182,21 @@ class calc {
     float[][] getLinkageMatrix(){ // calculating linkage matrix for single linkage clustering
         calculateDistanceMatrix(normalized);
         int maxClusters = 2 * rows - 1; // in the worst case we merge 2 clusters in each step
-        int[] sizes = new int[maxClusters]; // keeps track of the size of each cluster, initially all clusters are of size 1
+        int[] sizes = new int[maxClusters]; // keeps track of the size of each cluster
+        int[] active = new int[maxClusters]; // keeps track of which clusters are still active
         for (int i = 0; i < rows; i++){
+            active[i] = 1; // initialize all existing clusters as active
             sizes[i] = 1; // initially all clusters are of size 1, we have as many clusters as rows
-        }  
-        int[] active = new int[maxClusters]; // keeps track of which clusters are still active, initially all clusters are active
-        for (int i = 0; i < rows; i++){
-            active[i] = 1;
         } 
         nextClusterId = rows; // keeps track of the next cluster id after the original rows
 
         for (int i = 0; i < normalized.length - 1; i++){
-            float smallestDist = Float.MAX_VALUE; // initial large value
+            float smallestDist = Float.MAX_VALUE; // initial large value, thanks hanin for the tip!
             int closestRow = -1;
             int closestCol = -1;
             for (int j = 0; j < distanceMatrix.length; j++){
                 for (int k = 0; k < distanceMatrix[0].length; k++){
-                    if (j != k && active[j] == 1 && active[k] == 1){ // only consider distances between active clusters
+                    if (j != k && active[j] == 1 && active[k] == 1){ // only consider distances between active clusters, and ignore diagonal (distance between cluster and itself)
                         if (distanceMatrix[j][k] < smallestDist){
                             smallestDist = distanceMatrix[j][k];
                             closestRow = j;
@@ -207,19 +205,20 @@ class calc {
                     }
                 }
             }
-            if (closestRow == -1 || closestCol == -1){
-                println("wtf");
+            if (closestRow == -1 || closestCol == -1){ //sanity check, remove later
+                println("This should never print");
             }
-            linkageMatrix[i][0] = closestRow;
-            linkageMatrix[i][1] = closestCol;
-            linkageMatrix[i][2] = smallestDist;
-            linkageMatrix[i][3] = sizes[closestRow] + sizes[closestCol];
-            sizes[nextClusterId] = sizes[closestRow] + sizes[closestCol];
-            distanceMatrix = updateDistanceMatrix(distanceMatrix, closestRow, closestCol);
-            active[closestRow] = 0;
-            active[closestCol] = 0;
-            active[nextClusterId] = 1;
-            nextClusterId += 1;
+            linkageMatrix[i][0] = closestRow; // set first link as row of distance matrix = cluster ID of one
+            linkageMatrix[i][1] = closestCol; // set second link as column of distance matrix = cluster ID of the other
+            linkageMatrix[i][2] = smallestDist; // distance = distance...
+            int newSize = sizes[closestRow] + sizes[closestCol]; //size of new cluster is the sum of the sizes of the merged clusters
+            linkageMatrix[i][3] = newSize; // set size in linkage matrix
+            sizes[nextClusterId] = newSize; // set size of new cluster in sizes array
+            distanceMatrix = updateDistanceMatrix(distanceMatrix, closestRow, closestCol); // update distance matrix after merging clusters
+            active[closestRow] = 0; // set merged clusters as inactive
+            active[closestCol] = 0; // set merged clusters as inactive
+            active[nextClusterId] = 1; // set new cluster as active
+            nextClusterId += 1; // increment next cluster ID for the next merge. maybe i+rows could work too? This is good enough imo
         }
         return linkageMatrix;
     } 
