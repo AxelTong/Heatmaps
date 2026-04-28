@@ -13,6 +13,8 @@ String[] headers;
 boolean[] categorical;
 float[] normMin;
 float[] normMax;
+int lowerBound;
+int upperBound;
 
 int rows;
 int cols;
@@ -63,6 +65,8 @@ void setup() {
   // kleuren grading
   lowColor = color(120, 180, 120);
   highColor = color(180, 80, 80);
+  lowerBound = -3; // grenzen voor kleuring
+  upperBound = 3;
 
   loadCSV("heart.csv");
 
@@ -230,9 +234,9 @@ float norm;
 
 if (categorical[c]) {
   norm = map(normVal, normMin[c], normMax[c], 0, 1);
-} else { // Numerieke kolommen: kleur wordt vastgezet tussen -2 en 2, zoals Lorenzo voorstelde zodat extreme outliers niet de hele kleurenschaal bepalen.
-  normVal = constrain(normVal, -3, 3);
-  norm = map(normVal, -3, 3, 0, 1);
+} else { // Numerieke kolommen: kleur wordt vastgezet tussen lowerBound en upperBound, zoals Lorenzo voorstelde zodat extreme outliers niet de hele kleurenschaal bepalen.
+  normVal = constrain(normVal, lowerBound, upperBound);
+  norm = map(normVal, lowerBound, upperBound, 0, 1);
 }
 
 norm = constrain(norm, 0, 1);
