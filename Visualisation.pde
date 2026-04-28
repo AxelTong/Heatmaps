@@ -319,7 +319,9 @@ int hoveredRow = -1;
 // =========================
 
 
-//  color grading
+// =========================
+// GRADIENT LEGEND
+// =========================
 void setGradient(int x, int y, float w, float h, color c1, color c2) {
 
     for (int i = y; i <= y+h; i++) {
@@ -328,10 +330,15 @@ void setGradient(int x, int y, float w, float h, color c1, color c2) {
       stroke(c);
       line(x, i, x+w, i);
     }
+    text("-2", x - 20, y + h );
+    text("0", x - 20, y + h / 2);
+    text("2", x - 0, y + 5);
+  
 }
 
-// Drie manieren om te scrollen; scrollen (mousewheel), slepen (mousepressed) en pijltjes (keypressed)
-// deze functie is gevonden op reference van processing
+// =========================
+// SCROLLEN
+// =========================
 void mouseWheel (MouseEvent event) {
   float e = event.getCount();
   scrollY += e * scrollSpeed;
@@ -345,16 +352,13 @@ void keyPressed() {
   }
 
   if (key == '-') {
-    cellH = max(minCellH, cellH - 2);
+    cellH = max(minCellH, cellH - 2); // door max function te gebruiken voorkomen we dat cellH kleiner wordt dan minCellH, wat zou resulteren in een negatieve of nul celhoogte, wat niet zinvol is voor visualisatie.
   }
 
   if (key == '+') {
-    cellH = min(maxCellH, cellH + 2);
+    cellH = min(maxCellH, cellH + 2); // door min function te gebruiken voorkomen we dat cellH groter wordt dan maxCellH, wat zou resulteren in een onpraktische grote celhoogte, waardoor de heatmap moeilijk te navigeren zou zijn.
   }
 }
-
-
-// Dit was een best lastig deel; maar na wat yt filmpjes relatief simpel
 
 void mousePressed() {
   if (mouseX >= scrollbarX && mouseX <= scrollbarX + scrollbarWidth &&
@@ -398,6 +402,7 @@ void updateScrollFromThumb(float newThumbY) {
     thumbY = scrollbarY;
     return;
   }
+  
   // zeer belangrijk stuk; het mappen van scroll y maakt
   thumbY = constrain(newThumbY, scrollbarY, scrollbarY + maxThumbTravel);
   scrollY = map(thumbY, scrollbarY, scrollbarY + maxThumbTravel, 0, maxScrollY);
