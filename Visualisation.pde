@@ -223,14 +223,21 @@ rect(marginLeft - 2, marginTop - 2, gridWidth + 4, gridHeight + 4);
   for (int r = 0; r < rows; r++) {
     for (int c = 0; c < cols; c++) {
 
-  color cellColor;
+color cellColor;
 
-  float normVal = clusteredNorm[r][c];
-  float norm = map(normVal, normMin[c], normMax[c], 0, 1);
-  norm = constrain(norm, 0, 1);
+float normVal = clusteredNorm[r][c];
+float norm;
 
-  cellColor = lerpColor(lowColor, highColor, norm);
+if (categorical[c]) {
+  norm = map(normVal, normMin[c], normMax[c], 0, 1);
+} else { // Numerieke kolommen: kleur wordt vastgezet tussen -2 en 2, zoals Lorenzo voorstelde zodat extreme outliers niet de hele kleurenschaal bepalen.
+  normVal = constrain(normVal, -2, 2);
+  norm = map(normVal, -2, 2, 0, 1);
+}
 
+norm = constrain(norm, 0, 1);
+
+cellColor = lerpColor(lowColor, highColor, norm);
 
 fill(cellColor);
 
@@ -304,9 +311,8 @@ int hoveredRow = -1;
   fill(230);
   rect(scrollbarX, scrollbarY, scrollbarWidth, scrollbarH, 8);
 
-  float visibleRatio = gridHeight / HeightAllCells; 
-  thumbH = max(40, scrollbarH * visibleRatio); // thumb past zich aan wanneer er wordt in- of uitgezoomd, minimale hoogte is 40
-
+  float visibleRatio = gridHeight / HeightAllCells;  
+  thumbH = min(scrollbarH, max(40, scrollbarH * visibleRatio)); // maar kan niet groter worden dan de scrollbar zelf, dus we nemen de min van deze ratio en 1
   float maxThumb = scrollbarH - thumbH;
 
   if (maxScrollY == 0) {
@@ -338,7 +344,7 @@ void setGradient(int x, int y, float w, float h, color c1, color c2) {
     }
     text("-2", x - 20, y + h );
     text("0", x - 20, y + h / 2);
-    text("2", x - 0, y + 5);
+    text("2", x - 20, y + 5);
   
 }
 
@@ -393,14 +399,13 @@ void mouseReleased() {
   draggingThumb = false;
 }
 
-void updateScrollFromThumb(float newThumbY) {
+
+  void updateScrollFromThumb(float newThumbY) {
   float gridHeight = height - marginTop - marginBottom;
-  float cellH = 24;
   float totalContentHeight = rows * cellH;
   float maxScrollY = max(0, totalContentHeight - gridHeight);
 
   float maxThumbTravel = scrollbarH - thumbH;
-
 
   // checken of scrollen uberhaupt mogelijk is
   if (maxThumbTravel <= 0 || maxScrollY <= 0) {
@@ -408,11 +413,11 @@ void updateScrollFromThumb(float newThumbY) {
     thumbY = scrollbarY;
     return;
   }
-  
-  // zeer belangrijk stuk; het mappen van scroll y maakt
+
   thumbY = constrain(newThumbY, scrollbarY, scrollbarY + maxThumbTravel);
   scrollY = map(thumbY, scrollbarY, scrollbarY + maxThumbTravel, 0, maxScrollY);
 }
+
 
 // =========================
 //  PATIENT OVERVIEW
