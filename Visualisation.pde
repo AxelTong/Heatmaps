@@ -231,8 +231,8 @@ float norm;
 if (categorical[c]) {
   norm = map(normVal, normMin[c], normMax[c], 0, 1);
 } else { // Numerieke kolommen: kleur wordt vastgezet tussen -2 en 2, zoals Lorenzo voorstelde zodat extreme outliers niet de hele kleurenschaal bepalen.
-  normVal = constrain(normVal, -2, 2);
-  norm = map(normVal, -2, 2, 0, 1);
+  normVal = constrain(normVal, -3, 3);
+  norm = map(normVal, -3, 3, 0, 1);
 }
 
 norm = constrain(norm, 0, 1);
