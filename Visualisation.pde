@@ -58,11 +58,12 @@ float dragOffsetY = 0;
 // =========================
 
 void setup() {
-  size(1200, 720);
+  size(1200, 800);
 
   // kleuren grading
   lowColor = color(120, 180, 120);
   highColor = color(180, 80, 80);
+  
 
   loadCSV("heart.csv");
 
@@ -82,7 +83,7 @@ void setup() {
   }
 
   float[][] transposed = calcRows.transpose(clusteredRaw);
-  calcCols calcCols = new calcCols(rows, cols, transposed, headers);
+  calc calcCols = new calc(rows, cols, transposed, headers);
   float[][] linkageCols = calcCols.getLinkageMatrix();
   for (int i = 0; i < linkageCols.length; i++) { // debug print linkageCols matrix, ff afblijven pls
     for (int j = 0; j < linkageCols[i].length; j++) {
@@ -261,8 +262,8 @@ float norm;
 if (categorical[c] == true) {
   norm = map(normVal, normMin[c], normMax[c], 0, 1);
 } else { // Numerieke kolommen: kleur wordt vastgezet tussen -2 en 2, zoals Lorenzo voorstelde zodat extreme outliers niet de hele kleurenschaal bepalen.
-  normVal = constrain(normVal, -3, 3);
-  norm = map(normVal, -3, 3, 0, 1);
+  normVal = constrain(normVal, -2, 2);
+  norm = map(normVal, -2, 2, 0, 1);
 }
 
 norm = constrain(norm, 0, 1);
