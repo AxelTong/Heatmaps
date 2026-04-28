@@ -7,7 +7,7 @@ float[][] values;
 float[][] normalized;
 float[][] clusteredRaw;
 float[][] clusteredNorm;
-float[][] linkage;
+float[][] linkageRows;
 int[] rowOrder;
 String[] headers;
 boolean[] categorical;
@@ -66,24 +66,54 @@ void setup() {
 
   loadCSV("heart.csv");
 
-  calc calculate = new calc(cols, rows, values, headers);
-  categorical = calculate.matchCategoricals();
-  normalized = calculate.normalize();
-  clusteredRaw = calculate.getClusteredRaw();
-  clusteredNorm = calculate.getClusteredNorm();
-  normMax = calculate.getNormColumnMax();
-  normMin = calculate.getNormColumnMin(); 
-  float[][] linkage = new float[rows][cols];
-  linkage = calculate.getLinkageMatrix();
-  for (int i = 0; i < linkage.length; i++) { // debug print linkage matrix, ff afblijven pls
-    for (int j = 0; j < linkage[i].length; j++) {
-      print(linkage[i][j]);
+  calc calcRows = new calc(cols, rows, values, headers);
+  categorical = calcRows.matchCategoricals();
+  normalized = calcRows.normalize();
+  clusteredRaw = calcRows.getClusteredRaw();
+  clusteredNorm = calcRows.getClusteredNorm();
+  float[][] linkageRows = new float[rows][cols];
+  linkageRows = calcRows.getLinkageMatrix();
+  for (int i = 0; i < linkageRows.length; i++) { // debug print linkageRows matrix, ff afblijven pls
+    for (int j = 0; j < linkageRows[i].length; j++) {
+      print(linkageRows[i][j]);
       print(" ");
     }
     println();
   }
 
-  //println(calculate.getSortedPatientOrderFromLinkage());
+  float[][] transposed = calcRows.transpose(clusteredRaw);
+  calcCols calcCols = new calcCols(rows, cols, transposed, headers);
+  float[][] linkageCols = calcCols.getLinkageMatrix();
+  for (int i = 0; i < linkageCols.length; i++) { // debug print linkageCols matrix, ff afblijven pls
+    for (int j = 0; j < linkageCols[i].length; j++) {
+      print(linkageCols[i][j]);
+      print(" ");
+    }
+    println();
+  }
+
+  int[] colOrder = calcCols.getSortedPatientOrderFromLinkage();
+  String [] newHeaders = new String[headers.length];
+  boolean[] newCategorical = new boolean[categorical.length];
+  for (int i = 0; i < colOrder.length; i++) {
+    newHeaders[i] = headers[colOrder[i]];
+    newCategorical[i] = categorical[colOrder[i]];
+  }
+  headers = newHeaders;
+  categorical = newCategorical;
+  println();
+  println(categorical);
+  clusteredRaw = calcCols.transpose(calcCols.getClusteredRaw());
+  println(headers);
+  calc calcFinal = new calc(cols, rows, clusteredRaw, headers);
+  clusteredNorm = calcFinal.normalize();
+  println(clusteredNorm[1]); 
+  normMax = calcFinal.getNormColumnMax();
+  normMin = calcFinal.getNormColumnMin(); 
+ // println(aaa[0]);
+  //println(aaa[1]);
+
+  //println(calcRows.getSortedPatientOrderFromLinkage());
 }
 // =========================
 // CSV LADEN
@@ -228,11 +258,11 @@ color cellColor;
 float normVal = clusteredNorm[r][c];
 float norm;
 
-if (categorical[c]) {
+if (categorical[c] == true) {
   norm = map(normVal, normMin[c], normMax[c], 0, 1);
 } else { // Numerieke kolommen: kleur wordt vastgezet tussen -2 en 2, zoals Lorenzo voorstelde zodat extreme outliers niet de hele kleurenschaal bepalen.
-  normVal = constrain(normVal, -2, 2);
-  norm = map(normVal, -2, 2, 0, 1);
+  normVal = constrain(normVal, -3, 3);
+  norm = map(normVal, -3, 3, 0, 1);
 }
 
 norm = constrain(norm, 0, 1);
