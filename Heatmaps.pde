@@ -82,16 +82,6 @@ void setup() {
   normMin = calculate.getNormColumnMin(); 
   float[][] linkage = new float[rows][cols];
   linkage = calculate.getLinkageMatrix();
-  for (int i = 0; i < linkage.length; i++) { // debug print linkage matrix, ff afblijven pls
-    for (int j = 0; j < linkage[i].length; j++) {
-      print(linkage[i][j]);
-      print(" ");
-    }
-    println();
-  }
-  println(clusteredNorm[0]);
-
-  //println(calculate.getSortedPatientOrderFromLinkage());
 }
 // =========================
 // CSV LADEN
