@@ -25,8 +25,10 @@ class calc {
 
     boolean[] categorical;
     String[] headers;
+    String[] categoricals = {"sex", "fbs", "exang", "cp", "restecg", "slope", "thal"}; // hardcoded list of categorical variables, we can get this from the headers in the future if we want to make this more generalizable, but for now this is fine for our dataset.
 
     float[][] linkageMatrix;
+
     //================================
     // CONSTRUCTOR
     //================================
@@ -90,11 +92,14 @@ class calc {
 
     boolean[] matchCategoricals(){ // checks if it's a categorical variable based on headers, TODO: get this from an array instead of hardcoding this mess
         for (int i = 0; i < columns; i++){
-            if (headers[i].equals("sex") || headers[i].equals("fbs") || headers[i].equals("exang") || headers[i].equals("target") || headers[i].equals("cp") || headers[i].equals("restecg") || headers[i].equals("exang") || headers[i].equals("slope") || headers[i].equals("thal")){ // if the column is a categorical variable
+            for (int j = 0; j < categoricals.length; j++){
+                 if (headers[i].equals("sex") || headers[i].equals("fbs") || headers[i].equals("exang") || headers[i].equals("target") || headers[i].equals("cp") || headers[i].equals("restecg") || headers[i].equals("exang") || headers[i].equals("slope") || headers[i].equals("thal")){ // if the column is a categorical variable
                 categorical[i] = true;
             } else {
                 categorical[i] = false;
             }
+            }
+           
         }
         return categorical;
     }
@@ -206,9 +211,7 @@ class calc {
                     }
                 }
             }
-            if (closestRow == -1 || closestCol == -1){ //sanity check, remove later
-                println("This should never print");
-            }
+            
             linkageMatrix[i][0] = closestRow; // set first link as row of distance matrix = cluster ID of one
             linkageMatrix[i][1] = closestCol; // set second link as column of distance matrix = cluster ID of the other
             linkageMatrix[i][2] = smallestDist; // distance = distance...
