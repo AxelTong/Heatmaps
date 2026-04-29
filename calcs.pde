@@ -25,7 +25,7 @@ class calc {
 
     boolean[] categorical;
     String[] headers;
-    String[] categoricals = {"sex", "fbs", "exang", "cp", "restecg", "slope", "thal"}; // hardcoded list of categorical variables, we can get this from the headers in the future if we want to make this more generalizable, but for now this is fine for our dataset.
+    String[] categoricals = {"sex", "fbs", "exang", "cp", "restecg", "slope", "thal", "target"}; // hardcoded list of categorical variables, we can get this from the headers in the future if we want to make this more generalizable, but for now this is fine for our dataset.
 
     float[][] linkageMatrix;
 

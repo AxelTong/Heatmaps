@@ -340,9 +340,9 @@ void setGradient(int x, int y, float w, float h, color c1, color c2) {
       stroke(c);
       line(x, i, x+w, i);
     }
-    text("-2", x - 20, y + h );
+    text(lowerBound, x - 20, y + h );
     text("0", x - 20, y + h / 2);
-    text("2", x - 20, y + 5);
+    text(upperBound, x - 20, y + 5);
   
 }
 
