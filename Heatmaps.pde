@@ -80,8 +80,7 @@ void setup() {
   clusteredNorm = calculate.getClusteredNorm();
   normMax = calculate.getNormColumnMax();
   normMin = calculate.getNormColumnMin(); 
-  float[][] linkage = new float[rows][cols];
-  linkage = calculate.getLinkageMatrix();
+  calculate.getLinkageMatrix();
 }
 // =========================
 // CSV LADEN
