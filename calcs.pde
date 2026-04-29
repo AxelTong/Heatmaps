@@ -93,11 +93,12 @@ class calc {
     boolean[] matchCategoricals(){ // checks if it's a categorical variable based on headers, TODO: get this from an array instead of hardcoding this mess
         for (int i = 0; i < columns; i++){
             for (int j = 0; j < categoricals.length; j++){
-                 if (headers[i].equals("sex") || headers[i].equals("fbs") || headers[i].equals("exang") || headers[i].equals("target") || headers[i].equals("cp") || headers[i].equals("restecg") || headers[i].equals("exang") || headers[i].equals("slope") || headers[i].equals("thal")){ // if the column is a categorical variable
-                categorical[i] = true;
-            } else {
-                categorical[i] = false;
-            }
+                 if (headers[i].equals(categoricals[j])){ // if the column is a categorical variable
+                    categorical[i] = true;
+                    break; // if we found a match, we can stop checking the rest of the categoricals for this column
+                } else {
+                 categorical[i] = false;
+                }
             }
            
         }
