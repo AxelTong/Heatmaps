@@ -240,7 +240,7 @@ class calc {
        
         float [][] newDistanceMatrix = new float[distanceMatrix.length + 1][distanceMatrix[0].length + 1];
         int oldSize = distanceMatrix.length;
-        int newClusterIndex = oldSize; //codex did a weird thing here... I try using it once and it pulls this crap
+        int newClusterIndex = oldSize; //codex did a weird thing here... I try using it once and it pulls this crap. These 2 variables are the same. 
         for (int i = 0; i <= oldSize; i++){
             for (int j = 0; j <= oldSize; j++){
                 if (i < oldSize && j < oldSize) {
